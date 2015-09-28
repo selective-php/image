@@ -1,9 +1,9 @@
 {
-    "name": "odan/molengo-image",
+    "name": "odan/image",
     "type": "library",
-    "description": "Molengo image module",
+    "description": "Image library",
     "keywords": ["library"],
-    "homepage": "http://github.com/odan/molengo-image",
+    "homepage": "http://github.com/odan/image",
     "license": "MIT",
     "authors": [
         {
@@ -17,13 +17,13 @@
         "odan/molengo": "dev-master"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.6.*",
+        "phpunit/phpunit": "4.8.*",
         "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "Molengo\\": "src/Molengo",
-            "Molengo\\Test\\": "tests"
+            "Molengo\\Image\\": "src/Image",
+            "Molengo\\Image\\Test\\": "tests"
         }
     }
 }
