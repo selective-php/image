@@ -13,7 +13,6 @@
 # ------------------------------------------------------------------------------
 
 /tests              export-ignore
-/src/Molengo/Test   export-ignore
 /build              export-ignore
 /docs               export-ignore
 /build.xml          export-ignore

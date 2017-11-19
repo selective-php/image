@@ -1,12 +1,5 @@
 <?php
 
-/**
- * odan/image
- *
- * @copyright 2015 odan
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
- */
-
 namespace Odan\Image;
 
 use Exception;
@@ -16,7 +9,6 @@ use Exception;
  */
 class Image
 {
-
     /**
      * Save image object as file
      *
@@ -70,7 +62,7 @@ class Image
             $tmp = imagecreatetruecolor($w, $h);
             imagecopy($tmp, $im, 0, 0, 0, 0, $w, $h);
             imagedestroy($im);
-            $im = & $tmp;
+            $im = &$tmp;
         }
 
         $biBPLine = $w * 3;
@@ -115,7 +107,7 @@ class Image
             $tmp = imagecreatetruecolor($w, $h);
             imagecopy($tmp, $im, 0, 0, 0, 0, $w, $h);
             imagedestroy($im);
-            $im = & $tmp;
+            $im = &$tmp;
         }
 
         $biBPLine = $w * 2;
