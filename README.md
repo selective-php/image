@@ -1,2 +1,3 @@
-# molengo-image
+# odan/image
+
 Image manipulation library
