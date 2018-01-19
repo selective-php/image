@@ -168,7 +168,7 @@ class Image
     /**
      * Returns image from string
      *
-     * @param array $data String containing the image data
+     * @param string $data String containing the image data
      * @return resource
      */
     public function imageFromString($data)
@@ -204,11 +204,11 @@ class Image
      */
     public function addWatermark($backgroundFile, $watermarkFile, array $params = array())
     {
-        $w = gv($params, 'w', 1024);
-        $h = gv($params, 'h', null);
-        $sharpen = gv($params, 'sharpen', false);
-        $topPercent = gv($params, 'top_percent', 5);
-        $leftPercent = gv($params, 'left_percent', 5);
+        $w = isset($params['w']) ? $params['w'] : 1024;
+        $h = isset($params['h']) ? $params['h'] : null;
+        $sharpen = isset($params['sharpen']) ? $params['sharpen'] : false;
+        $topPercent = isset($params['top_percent']) ? $params['top_percent'] : 5;
+        $leftPercent = isset($params['left_percent']) ? $params['left_percent'] : 5;
 
         $imgWatermark = $this->getImage($watermarkFile);
         $imgBackground = $this->getImage($backgroundFile);
@@ -280,7 +280,7 @@ class Image
      * Create image resource from bmp file
      *
      * @param string $filename
-     * @return resource
+     * @return resource|false
      */
     public function createImageFromBmp($filename)
     {
@@ -427,6 +427,7 @@ class Image
      * @param int $height
      * @param bool $sharpen
      * @return bool
+     * @throws Exception
      */
     public function resizeFile($sourceFile, $destFile, $width, $height = null, $sharpen = true)
     {
@@ -664,13 +665,13 @@ class Image
     }
 
     /**
-     * Detroy image resource
+     * Destroy image resource
      *
      * @param resource $im image
-     * @return array
+     * @return bool
      */
     public function destroy($im)
     {
-        imagedestroy($im);
+        return imagedestroy($im);
     }
 }
