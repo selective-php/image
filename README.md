@@ -1,6 +1,6 @@
 # odan/image
 
-Image manipulation library
+Image manipulation library.
 
 [![Latest Version on Packagist](https://img.shields.io/github/release/odan/image.svg)](https://github.com/odan/image/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
