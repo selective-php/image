@@ -8,11 +8,13 @@
   "homepage": "https://github.com/odan/image",
   "license": "MIT",
   "require": {
-    "php": "^7.0"
+    "php": "^7.0",
+    "ext-gd": "*",
+    "ext-exif": "*"
   },
   "require-dev": {
     "php": "^7.0",
-    "phpunit/phpunit": "^6",
+    "phpunit/phpunit": "^6"
   },
   "autoload": {
     "psr-4": {

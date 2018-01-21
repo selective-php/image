@@ -17,22 +17,22 @@ class Image
      * @param integer $quality
      * @return bool
      */
-    public function convertImage(&$image, $filename, $quality = 100)
+    public function convertImage(&$image, $fileName, $quality = 100)
     {
         $result = false;
-        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        switch ($extension) {
-            case "jpeg":
-            case "jpg":
+        $checkImageType = exif_imagetype($fileName);
+
+        switch ($checkImageType) {
+            case IMAGETYPE_JPEG:
                 $result = imagejpeg($image, $filename, $quality);
                 break;
-            case "gif":
+            case IMAGETYPE_GIF:
                 $result = imagegif($image, $filename);
                 break;
-            case "png":
+            case IMAGETYPE_PNG:
                 $result = imagepng($image, $filename, $quality);
                 break;
-            case "bmp":
+            case IMAGETYPE_JPEG:
                 $data = $this->convertImageToBmp24($image);
                 $status = file_put_contents($filename, $data);
                 $result = ($status !== false);
@@ -51,7 +51,7 @@ class Image
      */
     public function convertImageToBmp24(&$im)
     {
-        if (!$im) {
+        if (!is_resource($im)) {
             return false;
         }
         $w = imagesx($im);
@@ -96,7 +96,7 @@ class Image
      */
     public function convertImageToBmp16(&$im)
     {
-        if (!$im) {
+        if (!is_resource($im)) {
             return false;
         }
         $w = imagesx($im);
@@ -147,6 +147,9 @@ class Image
      */
     public function getImageData($im, $type = 'jpg')
     {
+        if (!is_resource($im)) {
+            return false;
+        }
         ob_start();
         if ($type == 'jpg') {
             imagejpeg($im);
@@ -187,7 +190,7 @@ class Image
     public function convertFile($sourceFile, $destFile, $quality = 100)
     {
         $im = $this->getImage($sourceFile);
-        if (!$im) {
+        if (!is_resource($im)) {
             return false;
         }
         $result = $this->convertImage($im, $destFile, $quality);
