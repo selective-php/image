@@ -10,6 +10,13 @@ use PHPUnit\Framework\TestCase;
  */
 class ImageTest extends TestCase
 {
+    protected function tearDown()
+    {
+        @unlink('odan.jpg');
+        @unlink('odan.gif');
+        @unlink('odan.jpg');
+    }
+
     /**
      * Test create object.
      *
@@ -18,5 +25,10 @@ class ImageTest extends TestCase
     public function testInstance()
     {
         $this->assertInstanceOf(Image::class, new Image());
+    }
+
+    public function testConvertImage()
+    {
+
     }
 }
