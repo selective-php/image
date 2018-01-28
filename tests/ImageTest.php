@@ -114,7 +114,7 @@ class ImageTest extends TestCase
 
     public function testAddWatermark()
     {
-        $this->assertInternalType('resource', $this->image->addWatermark(__DIR__.'/odan.png', __DIR__.'/background.jpg', ['sharpen' => true]));
+        $this->assertInternalType('resource', $this->image->addWatermark(__DIR__.'/odan.png', __DIR__.'/background.jpeg', ['sharpen' => true]));
     }
 
     public function testGetImage()
