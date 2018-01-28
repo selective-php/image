@@ -13,28 +13,34 @@ class Image
      * Save image object as file
      *
      * @param resource $image Image resource
-     * @param string $filename Destination filename
+     * @param string $fileName Destination filename
      * @param integer $quality
      * @return bool
      */
-    public function convertImage(&$image, $fileName, $quality = 100)
+    public function convertImage($image, $fileName, $quality = 100)
     {
         $result = false;
-        $checkImageType = exif_imagetype($fileName);
-
-        switch ($checkImageType) {
-            case IMAGETYPE_JPEG:
-                $result = imagejpeg($image, $filename, $quality);
+        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if($extension !== 'png' && ($quality < 0 || $quality > 100)) {
+            throw new \InvalidArgumentException('The '.$extension.' image quality should be 0 to 100.');
+        }
+        if($extension === 'png' && ($quality < 0 || $quality > 9)) {
+            throw new \InvalidArgumentException('The '.$extension.' image quality should be 0 to 9.');
+        }
+        switch ($extension) {
+            case "jpeg":
+            case "jpg":
+                $result = imagejpeg($image, $fileName, $quality);
                 break;
-            case IMAGETYPE_GIF:
-                $result = imagegif($image, $filename);
+            case "gif":
+                $result = imagegif($image, $fileName);
                 break;
-            case IMAGETYPE_PNG:
-                $result = imagepng($image, $filename, $quality);
+            case "png":
+                $result = imagepng($image, $fileName, $quality);
                 break;
-            case IMAGETYPE_JPEG:
+            case "bmp":
                 $data = $this->convertImageToBmp24($image);
-                $status = file_put_contents($filename, $data);
+                $status = file_put_contents($fileName, $data);
                 $result = ($status !== false);
                 break;
         }
@@ -163,8 +169,7 @@ class Image
         if ($type == 'bmp') {
             imagewbmp($im);
         }
-        $result = ob_get_contents();
-        ob_end_flush();
+        $result = ob_get_clean();
         return $result;
     }
 
@@ -254,26 +259,29 @@ class Image
     /**
      * Returns image resource by filename
      *
-     * @param string $filename
+     * @param string $fileName
      * @return resource
      */
-    public function getImage($filename)
+    public function getImage($fileName)
     {
         $im = false;
-        $size = getimagesize($filename);
+        if(!file_exists($fileName)) {
+            return $im;
+        }
+        $size = getimagesize($fileName);
         switch ($size["mime"]) {
             case "image/jpeg":
-                $im = imagecreatefromjpeg($filename);
+                $im = imagecreatefromjpeg($fileName);
                 break;
             case "image/gif":
-                $im = imagecreatefromgif($filename);
+                $im = imagecreatefromgif($fileName);
                 break;
             case "image/png":
-                $im = imagecreatefrompng($filename);
+                $im = imagecreatefrompng($fileName);
                 break;
             case "image/bmp":
             case "image/x-ms-bmp":
-                $im = $this->createImageFromBmp($filename);
+                $im = $this->createImageFromBmp($fileName);
                 break;
         }
         return $im;
@@ -282,13 +290,13 @@ class Image
     /**
      * Create image resource from bmp file
      *
-     * @param string $filename
+     * @param string $fileName
      * @return resource|false
      */
-    public function createImageFromBmp($filename)
+    public function createImageFromBmp($fileName)
     {
         // open the file in binary mode
-        if (!$f1 = fopen($filename, "rb")) {
+        if (!$f1 = @fopen($fileName, "rb")) {
             return false;
         }
 
@@ -474,7 +482,7 @@ class Image
      * @param int $quality
      * @return bool
      */
-    public function copyImageResampled(&$dstImage, $srcImage, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH, $quality = 3)
+    public function copyImageResampled(&$dstImage, &$srcImage, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH, $quality = 3)
     {
         if (empty($srcImage) || empty($dstImage) || $quality <= 0) {
             return false;
