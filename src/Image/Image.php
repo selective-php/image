@@ -13,8 +13,8 @@ class Image
      * Save image object as file
      *
      * @param resource $image Image resource
+     * @param int $quality
      * @param string $fileName Destination filename
-     * @param integer $quality
      * @return bool
      */
     public function convertImage($image, $fileName, $quality = 100)
