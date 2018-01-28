@@ -28,7 +28,7 @@ class ImageTest extends TestCase
     protected function setUp()
     {
         $this->image = new Image();
-        $this->imgSrc = $this->image->getImage(__DIR__.'/odan.png');
+        $this->imgSrc = $this->image->getImage(__DIR__.'/odan.jpg');
     }
     
     /**
@@ -38,7 +38,7 @@ class ImageTest extends TestCase
      */
     protected function tearDown()
     {
-        @unlink(__DIR__.'/odan.jpg');
+        @unlink(__DIR__.'/odan.png');
         @unlink(__DIR__.'/odan.gif');
         @unlink(__DIR__.'/odan.bmp');
         @unlink(__DIR__.'/new_odan.png');
@@ -59,9 +59,9 @@ class ImageTest extends TestCase
 
     public function testConvertImageShouldReturnTrue()
     {
-        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__.'/odan.jpg'));
+        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__.'/odan.png', 0));
         $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__.'/odan.gif'));
-        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__.'/new_odan.png', 8));
+        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__.'/new_odan.jpg', 8));
         $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__.'/odan.bmp'));
     }
 
@@ -91,11 +91,11 @@ class ImageTest extends TestCase
 
     public function testGetImageData()
     {
-        $this->image->convertImage($this->imgSrc, __DIR__.'/odan.jpg');
+        $this->image->convertImage($this->imgSrc, __DIR__.'/odan.png', 0);
         $this->image->convertImage($this->imgSrc, __DIR__.'/odan.bmp');
         $this->image->convertImage($this->imgSrc, __DIR__.'/odan.gif');
 
-        $this->assertInternalType('string', $this->image->getImageData($this->imgSrc, 'png'));
+        $this->assertInternalType('string', $this->image->getImageData($this->imgSrc, 'jpg'));
         $this->assertInternalType('string', $this->image->getImageData($this->image->getImage(__DIR__.'/odan.jpg'), 'jpg'));
         $this->assertInternalType('string', $this->image->getImageData($this->image->getImage(__DIR__.'/odan.gif'), 'gif'));
         $this->assertInternalType('string', $this->image->getImageData($this->image->getImage(__DIR__.'/odan.bmp'), 'bmp'));
@@ -103,29 +103,29 @@ class ImageTest extends TestCase
 
     public function testImageFromString()
     {
-        $this->assertInternalType('resource', $this->image->imageFromString($this->image->getImageData($this->imgSrc, 'png')));
+        $this->assertInternalType('resource', $this->image->imageFromString($this->image->getImageData($this->imgSrc, 'jpg')));
     }
 
     public function testConvertFile()
     {
         $this::assertFalse($this->image->convertFile(__DIR__.'/../composer.json', __DIR__.'/dest_file'));
-        $this::assertTrue($this->image->convertFile(__DIR__.'/odan.png', __DIR__.'/new_odan.png', 0));
+        $this::assertTrue($this->image->convertFile(__DIR__.'/odan.jpg', __DIR__.'/new_odan.jpg', 0));
     }
 
     public function testAddWatermark()
     {
-        $this->assertInternalType('resource', $this->image->addWatermark(__DIR__.'/odan.png', __DIR__.'/background.jpeg', ['sharpen' => true]));
+        $this->assertInternalType('resource', $this->image->addWatermark(__DIR__.'/odan.jpg', __DIR__.'/background.jpeg', ['sharpen' => true]));
     }
 
     public function testGetImage()
     {
-        $this->image->convertImage($this->imgSrc, __DIR__.'/odan.jpg');
+        $this->image->convertImage($this->imgSrc, __DIR__.'/odan.png', 0);
         $this->image->convertImage($this->imgSrc, __DIR__.'/odan.gif');
         $this->image->convertImage($this->imgSrc, __DIR__.'/odan.bmp');
 
-        $this->assertInternalType('resource', $this->image->getImage(__DIR__.'/odan.jpg'));
-        $this->assertInternalType('resource', $this->image->getImage(__DIR__.'/odan.gif'));
         $this->assertInternalType('resource', $this->image->getImage(__DIR__.'/odan.png'));
+        $this->assertInternalType('resource', $this->image->getImage(__DIR__.'/odan.gif'));
+        $this->assertInternalType('resource', $this->image->getImage(__DIR__.'/odan.jpg'));
         $this->assertInternalType('resource', $this->image->getImage(__DIR__.'/odan.bmp'));
     }
 
@@ -138,7 +138,7 @@ class ImageTest extends TestCase
 
     public function testCreateImageFromBmpWithInvalidFileType()
     {
-        $this::assertFalse($this->image->createImageFromBmp(__DIR__.'/odan.png'));
+        $this::assertFalse($this->image->createImageFromBmp(__DIR__.'/odan.jpg'));
     }
 
     public function testCreateImageFromBmpWithInvalidImageFile()
@@ -148,17 +148,17 @@ class ImageTest extends TestCase
 
     public function testResizeImage()
     {
-        $this->assertInternalType('resource', $this->image->resizeImage($this->image->getImage(__DIR__.'/odan.png'), 100));
+        $this->assertInternalType('resource', $this->image->resizeImage($this->image->getImage(__DIR__.'/odan.jpg'), 100));
     }
 
     public function testResizeFile()
     {
-        $this::assertTrue($this->image->resizeFile(__DIR__.'/odan.png', __DIR__.'/new_odan.jpg', 100));
+        $this::assertTrue($this->image->resizeFile(__DIR__.'/odan.jpg', __DIR__.'/new_odan.jpg', 100));
     }
 
     public function testDestroy()
     {
-        $this::assertTrue($this->image->destroy($this->image->getImage(__DIR__.'/odan.png')));
+        $this::assertTrue($this->image->destroy($this->image->getImage(__DIR__.'/odan.jpg')));
     }
 
     public function testCopyImageResampledWithInvalidImageResource()
@@ -171,7 +171,8 @@ class ImageTest extends TestCase
     public function testConvertImageWithInvalidPngQuality()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->image->convertImage($this->imgSrc, __DIR__.'/new_odan.png');
+        $this->image->convertImage($this->imgSrc, __DIR__.'/odan.png');
+        $this->image->convertImage(__DIR__.'/odan.png', __DIR__.'/new_odan.png');
     }
 
     public function testConvertImageWithInvalidJpgQuality()
