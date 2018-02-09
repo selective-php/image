@@ -13,7 +13,6 @@ enabled:
   - phpdoc_types
   - php_unit_strict
   - alpha_ordered_imports
-  - encoding
   - include
   - blank_line_after_namespace
   - concat_with_spaces
