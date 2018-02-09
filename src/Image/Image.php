@@ -22,10 +22,10 @@ class Image
         $result = false;
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         if ($extension !== 'png' && ($quality < 0 || $quality > 100)) {
-            throw new \InvalidArgumentException('The '.$extension.' image quality should be 0 to 100.');
+            throw new \InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 100.');
         }
         if ($extension === 'png' && ($quality < 0 || $quality > 9)) {
-            throw new \InvalidArgumentException('The '.$extension.' image quality should be 0 to 9.');
+            throw new \InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 9.');
         }
         switch ($extension) {
             case "jpeg":
