@@ -12,6 +12,7 @@ enabled:
   - phpdoc_scalar
   - phpdoc_types
   - php_unit_strict
+  - concat_with_spaces
 
 finder:
   name:
