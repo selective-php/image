@@ -14,7 +14,7 @@ $imgSrc = $image->getImage('/path/to/image.png');
 $newWidth = 100;
 $newHeight = null;
 $sharpen = true;
-$imageDataString = $image-> resizeImage($imgSrc, $newWidth, $newHeight, $sharpen);
+$imageDataString = $image->resizeImage($imgSrc, $newWidth, $newHeight, $sharpen);
 ```
 
 ## Resize image from image file
