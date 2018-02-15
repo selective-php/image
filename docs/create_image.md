@@ -27,6 +27,11 @@ $image = new Image();
 $imgSrc = $image->createImageFromBmp('/path/to/image.bmp');
 ```
 
-## Destorry image resource
+## Destroy the image resource
 
-After manipulating the image file, you should destroy image resource to free the memeory.
+After manipulating the image file, you should destroy image resource to free the memory.
+
+```php
+$image = new Image();
+$imgSrc = $image->destroy($imgSrc);
+```
