@@ -2,14 +2,6 @@
 
 In this sample, you will learn how to convert the image to the specific image type.
 
-## Convert image to the BMP 14 image
-
-```php
-$image = new Image();
-$imgSrc = $image->getImage('/path/to/image.png');
-$imageDataString = $image->convertImageToBmp24($imgSrc);
-```
-
 ## Convert image to the BMP 16 image
 
 ```php
