@@ -17,7 +17,7 @@ Image manipulation library.
 
 ## Requirements
 
-* The ```GD``` extension shoud be required.
+* The ```GD``` extension
 
 ## Installation
 
@@ -43,6 +43,7 @@ $imageData = $image->getImageData($imgSrc, 'png'));
 ```
 
 Convert the image to the specific image type and get converted image data string.
+
 ```php
 $image->convertImage($imgSrc, '/path/to/odan.png', 0);
 $imageResource = $image->getImage('/path/to/odan.png');
