@@ -15,6 +15,10 @@ Image manipulation library.
 * Converting images to JPEG, GIF, PNG, BMP (16-Bit and 24-Bit)
 * Changing the size and sharpness of images
 
+## Requirements
+
+* The ```GD``` extension shoud be required.
+
 ## Installation
 
 ```
@@ -23,6 +27,25 @@ composer require odan/image
 
 ## Usage
 
+Create the image resource.
+
 ```php
-// todo
+$image = new Image();
+
+$imgSrc = $image->getImage('/path/to/odan.jpg');
 ```
+
+Convert the image to the specific image type and get converted image data string.
+
+```php
+$image->convertImage($imgSrc, '/path/to/odan.png', 0);
+$imageData = $image->getImageData($imgSrc, 'png'));
+```
+
+Convert the image to the specific image type and get converted image data string.
+```php
+$image->convertImage($imgSrc, '/path/to/odan.png', 0);
+$imageResource = $image->getImage('/path/to/odan.png');
+```
+
+If you want more details and examples about usage, please see the markdown file in ```docs``` folder.
