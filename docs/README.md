@@ -1,10 +1,6 @@
-# Odan/Image
+# Documentation
 
-## Introduction
-
-This ```README.md``` is ```odan/image``` official documentation.
-
-Here is the library usages are as follows:
+## Table of contents
 
 * [Create image](create_image.md)
 * [Convert image](convert_image.md)
