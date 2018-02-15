@@ -48,4 +48,4 @@ $image->convertImage($imgSrc, '/path/to/odan.png', 0);
 $imageResource = $image->getImage('/path/to/odan.png');
 ```
 
-If you want more details and examples about usage, please see the ```README.md``` file in ```docs``` folder.
+If you want more details and examples about usage, please read the [documentation](docs/README.md).
