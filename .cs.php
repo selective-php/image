@@ -13,6 +13,7 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'list_syntax' => ['syntax' => 'short'],
         'concat_space' => ['spacing' => 'one'],
+        'increment_style' => ['style' => 'post'],
         'declare_equal_normalize' => ['space' => 'single'],
         'no_short_echo_tag' => true,
         'protected_to_private' => false,
@@ -21,7 +22,7 @@ return PhpCsFixer\Config::create()
         'phpdoc_order' => true, // psr-5
         'phpdoc_no_empty_return' => false,
         'align_multiline_comment' => true, // psr-5
-        'general_phpdoc_annotation_remove' => ['annotations' => ["author", "package"]],
+        'general_phpdoc_annotation_remove' => ['annotations' => ['author', 'package']],
     ])
     ->setFinder(PhpCsFixer\Finder::create()
         ->in(__DIR__ . '/src')
