@@ -348,89 +348,89 @@ class Image
         }
 
         // load file header
-        $FILE = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
-        if ($FILE['file_type'] != 19778) {
+        $file = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
+        if ($file['file_type'] != 19778) {
             throw new RuntimeException(sprintf('Invalid BMP file type: %s', $fileName));
         }
 
         // load bmp headers
-        $BMP = unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
+        $bmp = unpack('Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
             '/Vcompression/Vsize_bitmap/Vhoriz_resolution' .
             '/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1, 40));
-        $BMP['colors'] = pow(2, $BMP['bits_per_pixel']);
-        if ($BMP['size_bitmap'] == 0) {
-            $BMP['size_bitmap'] = $FILE['file_size'] - $FILE['bitmap_offset'];
+        $bmp['colors'] = pow(2, $bmp['bits_per_pixel']);
+        if ($bmp['size_bitmap'] == 0) {
+            $bmp['size_bitmap'] = $file['file_size'] - $file['bitmap_offset'];
         }
-        $BMP['bytes_per_pixel'] = $BMP['bits_per_pixel'] / 8;
-        $BMP['bytes_per_pixel2'] = ceil($BMP['bytes_per_pixel']);
-        $BMP['decal'] = ($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
-        $BMP['decal'] -= floor($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
-        $BMP['decal'] = 4 - (4 * $BMP['decal']);
-        if ($BMP['decal'] == 4) {
-            $BMP['decal'] = 0;
+        $bmp['bytes_per_pixel'] = $bmp['bits_per_pixel'] / 8;
+        $bmp['bytes_per_pixel2'] = ceil($bmp['bytes_per_pixel']);
+        $bmp['decal'] = ($bmp['width'] * $bmp['bytes_per_pixel'] / 4);
+        $bmp['decal'] -= floor($bmp['width'] * $bmp['bytes_per_pixel'] / 4);
+        $bmp['decal'] = 4 - (4 * $bmp['decal']);
+        if ($bmp['decal'] == 4) {
+            $bmp['decal'] = 0;
         }
 
         // load color palette
-        $PALETTE = [];
-        if ($BMP['colors'] < 16777216) {
-            $PALETTE = unpack('V' . $BMP['colors'], fread($f1, $BMP['colors'] * 4));
+        $palette = [];
+        if ($bmp['colors'] < 16777216) {
+            $palette = unpack('V' . $bmp['colors'], fread($f1, $bmp['colors'] * 4));
         }
 
         // create image
-        $IMG = fread($f1, $BMP['size_bitmap']);
-        $VIDE = chr(0);
+        $img = fread($f1, $bmp['size_bitmap']);
+        $vide = chr(0);
 
-        $res = imagecreatetruecolor($BMP['width'], $BMP['height']);
-        $P = 0;
-        $Y = $BMP['height'] - 1;
+        $res = imagecreatetruecolor($bmp['width'], $bmp['height']);
+        $p = 0;
+        $Y = $bmp['height'] - 1;
         while ($Y >= 0) {
             $X = 0;
-            while ($X < $BMP['width']) {
-                if ($BMP['bits_per_pixel'] == 24) {
-                    $COLOR = unpack('V', substr($IMG, $P, 3) . $VIDE);
-                } elseif ($BMP['bits_per_pixel'] == 16) {
-                    $COLOR = unpack('n', substr($IMG, $P, 2));
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                } elseif ($BMP['bits_per_pixel'] == 8) {
-                    $COLOR = unpack('n', $VIDE . substr($IMG, $P, 1));
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                } elseif ($BMP['bits_per_pixel'] == 4) {
-                    $COLOR = unpack('n', $VIDE . substr($IMG, floor($P), 1));
-                    if (($P * 2) % 2 == 0) {
-                        $COLOR[1] = ($COLOR[1] >> 4);
+            while ($X < $bmp['width']) {
+                if ($bmp['bits_per_pixel'] == 24) {
+                    $color = unpack('V', substr($img, $p, 3) . $vide);
+                } elseif ($bmp['bits_per_pixel'] == 16) {
+                    $color = unpack('n', substr($img, $p, 2));
+                    $color[1] = $palette[$color[1] + 1];
+                } elseif ($bmp['bits_per_pixel'] == 8) {
+                    $color = unpack('n', $vide . substr($img, $p, 1));
+                    $color[1] = $palette[$color[1] + 1];
+                } elseif ($bmp['bits_per_pixel'] == 4) {
+                    $color = unpack('n', $vide . substr($img, floor($p), 1));
+                    if (($p * 2) % 2 == 0) {
+                        $color[1] = ($color[1] >> 4);
                     } else {
-                        $COLOR[1] = ($COLOR[1] & 0x0F);
+                        $color[1] = ($color[1] & 0x0F);
                     }
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                } elseif ($BMP['bits_per_pixel'] == 1) {
-                    $COLOR = unpack('n', $VIDE . substr($IMG, floor($P), 1));
-                    if (($P * 8) % 8 == 0) {
-                        $COLOR[1] = $COLOR[1] >> 7;
-                    } elseif (($P * 8) % 8 == 1) {
-                        $COLOR[1] = ($COLOR[1] & 0x40) >> 6;
-                    } elseif (($P * 8) % 8 == 2) {
-                        $COLOR[1] = ($COLOR[1] & 0x20) >> 5;
-                    } elseif (($P * 8) % 8 == 3) {
-                        $COLOR[1] = ($COLOR[1] & 0x10) >> 4;
-                    } elseif (($P * 8) % 8 == 4) {
-                        $COLOR[1] = ($COLOR[1] & 0x8) >> 3;
-                    } elseif (($P * 8) % 8 == 5) {
-                        $COLOR[1] = ($COLOR[1] & 0x4) >> 2;
-                    } elseif (($P * 8) % 8 == 6) {
-                        $COLOR[1] = ($COLOR[1] & 0x2) >> 1;
-                    } elseif (($P * 8) % 8 == 7) {
-                        $COLOR[1] = ($COLOR[1] & 0x1);
+                    $color[1] = $palette[$color[1] + 1];
+                } elseif ($bmp['bits_per_pixel'] == 1) {
+                    $color = unpack('n', $vide . substr($img, floor($p), 1));
+                    if (($p * 8) % 8 == 0) {
+                        $color[1] = $color[1] >> 7;
+                    } elseif (($p * 8) % 8 == 1) {
+                        $color[1] = ($color[1] & 0x40) >> 6;
+                    } elseif (($p * 8) % 8 == 2) {
+                        $color[1] = ($color[1] & 0x20) >> 5;
+                    } elseif (($p * 8) % 8 == 3) {
+                        $color[1] = ($color[1] & 0x10) >> 4;
+                    } elseif (($p * 8) % 8 == 4) {
+                        $color[1] = ($color[1] & 0x8) >> 3;
+                    } elseif (($p * 8) % 8 == 5) {
+                        $color[1] = ($color[1] & 0x4) >> 2;
+                    } elseif (($p * 8) % 8 == 6) {
+                        $color[1] = ($color[1] & 0x2) >> 1;
+                    } elseif (($p * 8) % 8 == 7) {
+                        $color[1] = ($color[1] & 0x1);
                     }
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
+                    $color[1] = $palette[$color[1] + 1];
                 } else {
                     throw new RuntimeException(sprintf('Invalid BMP header: %s', $fileName));
                 }
-                imagesetpixel($res, $X, $Y, $COLOR[1]);
+                imagesetpixel($res, $X, $Y, $color[1]);
                 $X++;
-                $P += $BMP['bytes_per_pixel'];
+                $p += $bmp['bytes_per_pixel'];
             }
             $Y--;
-            $P += $BMP['decal'];
+            $p += $bmp['decal'];
         }
 
         // close the file
