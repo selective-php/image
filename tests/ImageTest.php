@@ -11,12 +11,12 @@ use PHPUnit\Framework\TestCase;
 class ImageTest extends TestCase
 {
     /**
-     * @var Image
+     * @var Image|null
      */
     protected $image;
 
     /**
-     * Image resource.
+     * Image resource|null.
      */
     protected $imgSrc;
 
@@ -80,8 +80,7 @@ class ImageTest extends TestCase
      */
     public function testConvertImageToBmp24WithInvalidImgResource()
     {
-        $resource = 'invalid_img_resource';
-
+        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
         $this->image->convertImageToBmp24($resource);
     }
 
@@ -90,8 +89,7 @@ class ImageTest extends TestCase
      */
     public function testConvertImageToBmp16WithInvalidImgResource()
     {
-        $resource = 'invalid_img_resource';
-
+        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
         $this->image->convertImageToBmp16($resource);
     }
 
@@ -149,14 +147,20 @@ class ImageTest extends TestCase
         $this->assertInternalType('resource', $this->image->createImageFromBmp(__DIR__ . '/odan.bmp'));
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testCreateImageFromBmpWithInvalidFileType()
     {
-        $this::assertFalse($this->image->createImageFromBmp(__DIR__ . '/odan.jpg'));
+        $this->image->createImageFromBmp(__DIR__ . '/odan.jpg');
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testCreateImageFromBmpWithInvalidImageFile()
     {
-        $this::assertFalse($this->image->createImageFromBmp('invalid_image_file'));
+        $this->image->createImageFromBmp('invalid_image_file');
     }
 
     public function testResizeImage()
@@ -174,18 +178,23 @@ class ImageTest extends TestCase
         $this::assertTrue($this->image->destroy($this->image->getImage(__DIR__ . '/odan.jpg')));
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testCopyImageResampledWithInvalidImageResource()
     {
-        $imgResource = null;
-
-        $this::assertFalse($this->image->copyImageResampled($imgResource, $imgResource, 0, 0, 0, 0, 0, 0, 0, 0, $quality = 3));
+        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
+        $this->image->copyImageResampled($resource, $resource, 0, 0, 0, 0, 0, 0, 0, 0, $quality = 3);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testConvertImageWithInvalidPngQuality()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.png');
-        $this->image->convertImage(__DIR__ . '/odan.png', __DIR__ . '/new_odan.png');
+        $this->image->convertImage($this->image->getImage(__DIR__ . '/odan.png'), __DIR__ . '/new_odan.png', 100);
     }
 
     public function testConvertImageWithInvalidJpgQuality()
@@ -199,7 +208,8 @@ class ImageTest extends TestCase
      */
     public function testGetImageDataWithInvalidResource()
     {
-        $this->image->getImageData('invalid_img_resource', 'png');
+        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
+        $this->image->getImageData($resource, 'png');
     }
 
     public function testResizeFileWithInvalidResource()

@@ -23,9 +23,7 @@ class Image
      */
     public function convertImage($image, $fileName, $quality = 100)
     {
-        if (!is_resource($image)) {
-            throw new RuntimeException('Must be a resource');
-        }
+        $this->validateImageResource($image);
 
         $result = false;
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -69,9 +67,7 @@ class Image
      */
     public function convertImageToBmp24(&$im)
     {
-        if (!is_resource($im)) {
-            throw new RuntimeException('Must be a resource');
-        }
+        $this->validateImageResource($im);
 
         $w = imagesx($im);
         $h = imagesy($im);
@@ -119,9 +115,8 @@ class Image
      */
     public function convertImageToBmp16(&$im)
     {
-        if (!is_resource($im)) {
-            throw new RuntimeException('Must be a resource');
-        }
+        $this->validateImageResource($im);
+
         $w = imagesx($im);
         $h = imagesy($im);
         $result = '';
@@ -163,6 +158,24 @@ class Image
     }
 
     /**
+     * Validate image resource.
+     *
+     * @param resource|mixed $image Image
+     *
+     * @throws RuntimeException
+     *
+     * @return bool True
+     */
+    protected function validateImageResource($image)
+    {
+        if (!is_resource($image) || get_resource_type($image) !== 'gd') {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
+
+        return true;
+    }
+
+    /**
      * Returns image binary data from image resource.
      *
      * @param resource $im
@@ -174,9 +187,8 @@ class Image
      */
     public function getImageData($im, string $type = 'jpg')
     {
-        if (!is_resource($im)) {
-            throw new RuntimeException('Must be a resource');
-        }
+        $this->validateImageResource($im);
+
         ob_start();
         if ($type == 'jpg') {
             imagejpeg($im);
@@ -315,9 +327,7 @@ class Image
                 break;
         }
 
-        if (!is_resource($im)) {
-            throw new RuntimeException('Must be a resource');
-        }
+        $this->validateImageResource($im);
 
         return $im;
     }
@@ -327,19 +337,19 @@ class Image
      *
      * @param string $fileName
      *
-     * @return resource|false
+     * @return resource
      */
     public function createImageFromBmp($fileName)
     {
         // open the file in binary mode
         if (!$f1 = @fopen($fileName, 'rb')) {
-            return false;
+            throw new RuntimeException(sprintf('File could not be opened: %s', $fileName));
         }
 
         // load file header
         $FILE = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
         if ($FILE['file_type'] != 19778) {
-            return false;
+            throw new RuntimeException(sprintf('Invalid BMP file type: %s', $fileName));
         }
 
         // load bmp headers
@@ -412,7 +422,7 @@ class Image
                     }
                     $COLOR[1] = $PALETTE[$COLOR[1] + 1];
                 } else {
-                    return false;
+                    throw new RuntimeException(sprintf('Invalid BMP header: %s', $fileName));
                 }
                 imagesetpixel($res, $X, $Y, $COLOR[1]);
                 ++$X;
@@ -524,9 +534,13 @@ class Image
      */
     public function copyImageResampled(&$dstImage, &$srcImage, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH, $quality = 3)
     {
-        if (empty($srcImage) || empty($dstImage) || $quality <= 0) {
-            return false;
+        $this->validateImageResource($dstImage);
+        $this->validateImageResource($srcImage);
+
+        if ($quality <= 0) {
+            throw new RuntimeException(sprintf('Invalid quality: %s', $quality));
         }
+
         if ($quality < 5 && (($dstW * $quality) < $srcW || ($dstH * $quality) < $srcH)) {
             $temp = imagecreatetruecolor($dstH * $quality + 1, $dstH * $quality + 1);
             imagecopyresized($temp, $srcImage, 0, 0, $srcX, $srcY, $dstH * $quality + 1, $dstH * $quality + 1, $srcW, $srcH);
