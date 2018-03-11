@@ -91,12 +91,12 @@ class Image
         $result .= pack('VVVvvVVVVVV', 40, $w, $h, 1, 24, 0, $biSizeImage, 0, 0, 0, 0);
 
         $numpad = $biStride - $biBPLine;
-        for ($y = $h - 1; $y >= 0; --$y) {
-            for ($x = 0; $x < $w; ++$x) {
+        for ($y = $h - 1; $y >= 0; $y--) {
+            for ($x = 0; $x < $w; $x++) {
                 $col = imagecolorat($im, $x, $y);
                 $result .= substr(pack('V', $col), 0, 3);
             }
-            for ($i = 0; $i < $numpad; ++$i) {
+            for ($i = 0; $i < $numpad; $i++) {
                 $result .= pack('C', 0);
             }
         }
@@ -140,8 +140,8 @@ class Image
 
         //for ($y = $h - 1; $y >= 0; --$y) {
         $result .= pack('VVV', 63488, 2016, 31);
-        for ($y = 0; $y < $h; ++$y) {
-            for ($x = 0; $x < $w; ++$x) {
+        for ($y = 0; $y < $h; $y++) {
+            for ($x = 0; $x < $w; $x++) {
                 $rgb = imagecolorat($im, $x, $y);
                 $r24 = ($rgb >> 16) & 0xFF;
                 $g24 = ($rgb >> 8) & 0xFF;
@@ -149,7 +149,7 @@ class Image
                 $col = ((($r24 >> 3) << 11) | (($g24 >> 2) << 5) | ($b24 >> 3));
                 $result .= pack('v', $col);
             }
-            for ($i = 0; $i < $numpad; ++$i) {
+            for ($i = 0; $i < $numpad; $i++) {
                 $result .= pack('C', 0);
             }
         }
@@ -426,10 +426,10 @@ class Image
                     throw new RuntimeException(sprintf('Invalid BMP header: %s', $fileName));
                 }
                 imagesetpixel($res, $X, $Y, $COLOR[1]);
-                ++$X;
+                $X++;
                 $P += $BMP['bytes_per_pixel'];
             }
-            --$Y;
+            $Y--;
             $P += $BMP['decal'];
         }
 
@@ -653,9 +653,9 @@ class Image
      */
     protected function calcDifferenceBlurredThreshold(&$img, &$imgBlur, $w, $h, $amount, $threshold)
     {
-        for ($x = 0; $x < $w - 1; ++$x) {
+        for ($x = 0; $x < $w - 1; $x++) {
             // each row
-            for ($y = 0; $y < $h; ++$y) {
+            for ($y = 0; $y < $h; $y++) {
                 // each pixel
                 $rgbOrig = imagecolorat($img, $x, $y);
                 $rOrig = (($rgbOrig >> 16) & 0xFF);
@@ -696,9 +696,9 @@ class Image
      */
     protected function calcDifferenceBlurred(&$img, &$imgBlur, $w, $h, $amount)
     {
-        for ($x = 0; $x < $w; ++$x) {
+        for ($x = 0; $x < $w; $x++) {
             // each row
-            for ($y = 0; $y < $h; ++$y) {
+            for ($y = 0; $y < $h; $y++) {
                 // each pixel
                 $rgbOrig = imagecolorat($img, $x, $y);
                 $rOrig = (($rgbOrig >> 16) & 0xFF);
