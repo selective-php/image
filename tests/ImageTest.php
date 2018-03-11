@@ -6,17 +6,17 @@ use Odan\Image\Image;
 use PHPUnit\Framework\TestCase;
 
 /**
- * ExampleTest
+ * ExampleTest.
  */
 class ImageTest extends TestCase
 {
     /**
-     * Image calss
+     * Image calss.
      */
     protected $image;
 
     /**
-     * Image resource
+     * Image resource.
      */
     protected $imgSrc;
 

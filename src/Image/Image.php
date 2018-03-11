@@ -5,16 +5,17 @@ namespace Odan\Image;
 use Exception;
 
 /**
- * Image Class
+ * Image Class.
  */
 class Image
 {
     /**
-     * Save image object as file
+     * Save image object as file.
      *
      * @param resource $image Image resource
      * @param int $quality
      * @param string $fileName Destination filename
+     *
      * @return bool
      */
     public function convertImage($image, $fileName, $quality = 100)
@@ -28,32 +29,34 @@ class Image
             throw new \InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 9.');
         }
         switch ($extension) {
-            case "jpeg":
-            case "jpg":
+            case 'jpeg':
+            case 'jpg':
                 $result = imagejpeg($image, $fileName, $quality);
                 break;
-            case "gif":
+            case 'gif':
                 $result = imagegif($image, $fileName);
                 break;
-            case "png":
+            case 'png':
                 $result = imagepng($image, $fileName, $quality);
                 break;
-            case "bmp":
+            case 'bmp':
                 $data = $this->convertImageToBmp24($image);
                 $status = file_put_contents($fileName, $data);
                 $result = ($status !== false);
                 break;
         }
+
         return $result;
     }
 
     /**
-     * Convert image resource to bmp format (24 bit)
+     * Convert image resource to bmp format (24 bit).
      *
      * @param resource $im
+     *
      * @return string $result binary data
      *
-     * @link http://www.codingforums.com/archive/index.php/t-157438.html
+     * @see http://www.codingforums.com/archive/index.php/t-157438.html
      */
     public function convertImageToBmp24(&$im)
     {
@@ -91,13 +94,15 @@ class Image
                 $result .= pack('C', 0);
             }
         }
+
         return $result;
     }
 
     /**
-     * Convert image resource to bmp format (16 bit)
+     * Convert image resource to bmp format (16 bit).
      *
      * @param resource $im Image resource
+     *
      * @return string|bool $result binary data
      */
     public function convertImageToBmp16(&$im)
@@ -141,14 +146,16 @@ class Image
                 $result .= pack('C', 0);
             }
         }
+
         return $result;
     }
 
     /**
-     * Returns image binary data from image resource
+     * Returns image binary data from image resource.
      *
      * @param resource $im
      * @param string $type data type (jpg,png,gif,bmp)
+     *
      * @return string
      */
     public function getImageData($im, $type = 'jpg')
@@ -170,13 +177,15 @@ class Image
             imagewbmp($im);
         }
         $result = ob_get_clean();
+
         return $result;
     }
 
     /**
-     * Returns image from string
+     * Returns image from string.
      *
      * @param string $data String containing the image data
+     *
      * @return resource
      */
     public function imageFromString($data)
@@ -185,11 +194,12 @@ class Image
     }
 
     /**
-     * Converto image file to new format
+     * Converto image file to new format.
      *
      * @param string $sourceFile
      * @param string $destFile
      * @param int $quality
+     *
      * @return bool
      */
     public function convertFile($sourceFile, $destFile, $quality = 100)
@@ -199,18 +209,20 @@ class Image
             return false;
         }
         $result = $this->convertImage($im, $destFile, $quality);
+
         return $result;
     }
 
     /**
-     * Add watermark to image
+     * Add watermark to image.
      *
      * @param string $backgroundFile background image filename
      * @param string $watermarkFile watermark image filename
      * @param array $params optional parameters
+     *
      * @return resource image
      */
-    public function addWatermark($backgroundFile, $watermarkFile, array $params = array())
+    public function addWatermark($backgroundFile, $watermarkFile, array $params = [])
     {
         $w = isset($params['w']) ? $params['w'] : 1024;
         $h = isset($params['h']) ? $params['h'] : null;
@@ -253,13 +265,15 @@ class Image
             $threshold = 3;
             $out = $this->unsharpMask($out, $amount, $radius, $threshold);
         }
+
         return $out;
     }
 
     /**
-     * Returns image resource by filename
+     * Returns image resource by filename.
      *
      * @param string $fileName
+     *
      * @return resource
      */
     public function getImage($fileName)
@@ -269,39 +283,41 @@ class Image
             return $im;
         }
         $size = getimagesize($fileName);
-        switch ($size["mime"]) {
-            case "image/jpeg":
+        switch ($size['mime']) {
+            case 'image/jpeg':
                 $im = imagecreatefromjpeg($fileName);
                 break;
-            case "image/gif":
+            case 'image/gif':
                 $im = imagecreatefromgif($fileName);
                 break;
-            case "image/png":
+            case 'image/png':
                 $im = imagecreatefrompng($fileName);
                 break;
-            case "image/bmp":
-            case "image/x-ms-bmp":
+            case 'image/bmp':
+            case 'image/x-ms-bmp':
                 $im = $this->createImageFromBmp($fileName);
                 break;
         }
+
         return $im;
     }
 
     /**
-     * Create image resource from bmp file
+     * Create image resource from bmp file.
      *
      * @param string $fileName
+     *
      * @return resource|false
      */
     public function createImageFromBmp($fileName)
     {
         // open the file in binary mode
-        if (!$f1 = @fopen($fileName, "rb")) {
+        if (!$f1 = @fopen($fileName, 'rb')) {
             return false;
         }
 
         // load file header
-        $FILE = unpack("vfile_type/Vfile_size/Vreserved/Vbitmap_offset", fread($f1, 14));
+        $FILE = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
         if ($FILE['file_type'] != 19778) {
             return false;
         }
@@ -324,7 +340,7 @@ class Image
         }
 
         // load color palette
-        $PALETTE = array();
+        $PALETTE = [];
         if ($BMP['colors'] < 16777216) {
             $PALETTE = unpack('V' . $BMP['colors'], fread($f1, $BMP['colors'] * 4));
         }
@@ -340,15 +356,15 @@ class Image
             $X = 0;
             while ($X < $BMP['width']) {
                 if ($BMP['bits_per_pixel'] == 24) {
-                    $COLOR = unpack("V", substr($IMG, $P, 3) . $VIDE);
+                    $COLOR = unpack('V', substr($IMG, $P, 3) . $VIDE);
                 } elseif ($BMP['bits_per_pixel'] == 16) {
-                    $COLOR = unpack("n", substr($IMG, $P, 2));
+                    $COLOR = unpack('n', substr($IMG, $P, 2));
                     $COLOR[1] = $PALETTE[$COLOR[1] + 1];
                 } elseif ($BMP['bits_per_pixel'] == 8) {
-                    $COLOR = unpack("n", $VIDE . substr($IMG, $P, 1));
+                    $COLOR = unpack('n', $VIDE . substr($IMG, $P, 1));
                     $COLOR[1] = $PALETTE[$COLOR[1] + 1];
                 } elseif ($BMP['bits_per_pixel'] == 4) {
-                    $COLOR = unpack("n", $VIDE . substr($IMG, floor($P), 1));
+                    $COLOR = unpack('n', $VIDE . substr($IMG, floor($P), 1));
                     if (($P * 2) % 2 == 0) {
                         $COLOR[1] = ($COLOR[1] >> 4);
                     } else {
@@ -356,7 +372,7 @@ class Image
                     }
                     $COLOR[1] = $PALETTE[$COLOR[1] + 1];
                 } elseif ($BMP['bits_per_pixel'] == 1) {
-                    $COLOR = unpack("n", $VIDE . substr($IMG, floor($P), 1));
+                    $COLOR = unpack('n', $VIDE . substr($IMG, floor($P), 1));
                     if (($P * 8) % 8 == 0) {
                         $COLOR[1] = $COLOR[1] >> 7;
                     } elseif (($P * 8) % 8 == 1) {
@@ -379,25 +395,27 @@ class Image
                     return false;
                 }
                 imagesetpixel($res, $X, $Y, $COLOR[1]);
-                $X++;
+                ++$X;
                 $P += $BMP['bytes_per_pixel'];
             }
-            $Y--;
+            --$Y;
             $P += $BMP['decal'];
         }
 
         // close the file
         fclose($f1);
+
         return $res;
     }
 
     /**
-     * Resize image resource
+     * Resize image resource.
      *
      * @param resource $image
      * @param int $width
      * @param int $height
      * @param bool $sharpen
+     *
      * @return resource
      */
     public function resizeImage($image, $width, $height = null, $sharpen = true)
@@ -430,15 +448,17 @@ class Image
     }
 
     /**
-     * Resize image
+     * Resize image.
      *
      * @param string $sourceFile
      * @param string $destFile
      * @param int $width
      * @param int $height
      * @param bool $sharpen
-     * @return bool
+     *
      * @throws Exception
+     *
+     * @return bool
      */
     public function resizeFile($sourceFile, $destFile, $width, $height = null, $sharpen = true)
     {
@@ -449,6 +469,7 @@ class Image
         $image2 = $this->resizeImage($image, $width, $height, $sharpen);
         // save to file
         $result = imagejpeg($image2, $destFile, 100);
+
         return $result;
     }
 
@@ -480,6 +501,7 @@ class Image
      * @param int $srcW
      * @param int $srcH
      * @param int $quality
+     *
      * @return bool
      */
     public function copyImageResampled(&$dstImage, &$srcImage, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH, $quality = 3)
@@ -495,6 +517,7 @@ class Image
         } else {
             imagecopyresampled($dstImage, $srcImage, $dstX, $dstY, $srcX, $srcY, $dstW, $dstH, $srcW, $srcH);
         }
+
         return true;
     }
 
@@ -532,6 +555,7 @@ class Image
      * @param float $amount
      * @param float $radius
      * @param int $threshold
+     *
      * @return resource
      */
     protected function unsharpMask($img, $amount, $radius, $threshold)
@@ -561,11 +585,11 @@ class Image
         $imgBlur = imagecreatetruecolor($w, $h);
 
         // Gaussian blur matrix
-        $matrix = array(
-            array(1, 2, 1),
-            array(2, 4, 2),
-            array(1, 2, 1)
-        );
+        $matrix = [
+            [1, 2, 1],
+            [2, 4, 2],
+            [1, 2, 1],
+        ];
         imagecopy($imgBlur, $img, 0, 0, 0, 0, $w, $h);
         imageconvolution($imgBlur, $matrix, 16, 0);
 
@@ -577,12 +601,13 @@ class Image
 
         imagedestroy($imgCanvas);
         imagedestroy($imgBlur);
+
         return $img;
     }
 
     /**
      * Calculate the difference between the blurred pixels and the original
-     * and set the pixels
+     * and set the pixels.
      *
      * @param resource $img
      * @param resource $imgBlur
@@ -590,13 +615,14 @@ class Image
      * @param int $h
      * @param int $amount
      * @param int $threshold
+     *
      * @return void
      */
     protected function calcDifferenceBlurredThreshold(&$img, &$imgBlur, $w, $h, $amount, $threshold)
     {
-        for ($x = 0; $x < $w - 1; $x++) {
+        for ($x = 0; $x < $w - 1; ++$x) {
             // each row
-            for ($y = 0; $y < $h; $y++) {
+            for ($y = 0; $y < $h; ++$y) {
                 // each pixel
                 $rgbOrig = imagecolorat($img, $x, $y);
                 $rOrig = (($rgbOrig >> 16) & 0xFF);
@@ -625,20 +651,21 @@ class Image
 
     /**
      * Calculate the difference between the blurred pixels and the original
-     * and set the pixels
+     * and set the pixels.
      *
      * @param resource $img
      * @param resource $imgBlur
      * @param int $w
      * @param int $h
      * @param int $amount
+     *
      * @return void
      */
     protected function calcDifferenceBlurred(&$img, &$imgBlur, $w, $h, $amount)
     {
-        for ($x = 0; $x < $w; $x++) {
+        for ($x = 0; $x < $w; ++$x) {
             // each row
-            for ($y = 0; $y < $h; $y++) {
+            for ($y = 0; $y < $h; ++$y) {
                 // each pixel
                 $rgbOrig = imagecolorat($img, $x, $y);
                 $rOrig = (($rgbOrig >> 16) & 0xFF);
@@ -676,9 +703,10 @@ class Image
     }
 
     /**
-     * Destroy image resource
+     * Destroy image resource.
      *
      * @param resource $im image
+     *
      * @return bool
      */
     public function destroy($im)
