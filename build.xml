@@ -5,7 +5,6 @@
         <os family="windows"/>
     </condition>
 
-    <!-- By default, we assume all tools to be on the $PATH -->
     <condition property="ext" value=".bat" else="">
         <os family="windows"/>
     </condition>

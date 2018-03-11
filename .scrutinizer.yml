@@ -1,7 +1,5 @@
 filter:
-    excluded_paths:
-        - "tests/"
-        - "vendor/"
+    paths: ["src/*"]
 
 tools:
     external_code_coverage:
@@ -10,7 +8,7 @@ tools:
 
 build:
     environment:
-        php: 7.1.3
+        php: 7.2
         mysql: true
         node: false
         postgresql: false
