@@ -168,7 +168,7 @@ class Image
      */
     protected function validateImageResource($image)
     {
-        if (empty(!$image) || !is_resource($image) || get_resource_type($image) !== 'gd') {
+        if (empty($image) || !is_resource($image) || get_resource_type($image) !== 'gd') {
             throw new RuntimeException('Image must be a valid image resource');
         }
 
