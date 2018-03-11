@@ -2,7 +2,8 @@
 
 namespace Odan\Image;
 
-use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Image Class.
@@ -16,17 +17,23 @@ class Image
      * @param int $quality
      * @param string $fileName Destination filename
      *
+     * @throws RuntimeException
+     *
      * @return bool
      */
     public function convertImage($image, $fileName, $quality = 100)
     {
+        if (!is_resource($image)) {
+            throw new RuntimeException('Must be a resource');
+        }
+
         $result = false;
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         if ($extension !== 'png' && ($quality < 0 || $quality > 100)) {
-            throw new \InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 100.');
+            throw new InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 100.');
         }
         if ($extension === 'png' && ($quality < 0 || $quality > 9)) {
-            throw new \InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 9.');
+            throw new InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 9.');
         }
         switch ($extension) {
             case 'jpeg':
@@ -54,6 +61,8 @@ class Image
      *
      * @param resource $im
      *
+     * @throws RuntimeException
+     *
      * @return string $result binary data
      *
      * @see http://www.codingforums.com/archive/index.php/t-157438.html
@@ -61,8 +70,9 @@ class Image
     public function convertImageToBmp24(&$im)
     {
         if (!is_resource($im)) {
-            return false;
+            throw new RuntimeException('Must be a resource');
         }
+
         $w = imagesx($im);
         $h = imagesy($im);
         $result = '';
@@ -103,12 +113,14 @@ class Image
      *
      * @param resource $im Image resource
      *
-     * @return string|bool $result binary data
+     * @throws RuntimeException
+     *
+     * @return string $result binary data
      */
     public function convertImageToBmp16(&$im)
     {
         if (!is_resource($im)) {
-            return false;
+            throw new RuntimeException('Must be a resource');
         }
         $w = imagesx($im);
         $h = imagesy($im);
@@ -154,14 +166,16 @@ class Image
      * Returns image binary data from image resource.
      *
      * @param resource $im
-     * @param string $type data type (jpg,png,gif,bmp)
+     * @param string $type data type (jpg, png, gif, bmp)
+     *
+     * @throws RuntimeException
      *
      * @return string
      */
-    public function getImageData($im, $type = 'jpg')
+    public function getImageData($im, string $type = 'jpg')
     {
         if (!is_resource($im)) {
-            return false;
+            throw new RuntimeException('Must be a resource');
         }
         ob_start();
         if ($type == 'jpg') {
@@ -200,14 +214,13 @@ class Image
      * @param string $destFile
      * @param int $quality
      *
+     * @throws RuntimeException
+     *
      * @return bool
      */
     public function convertFile($sourceFile, $destFile, $quality = 100)
     {
         $im = $this->getImage($sourceFile);
-        if (!is_resource($im)) {
-            return false;
-        }
         $result = $this->convertImage($im, $destFile, $quality);
 
         return $result;
@@ -274,14 +287,17 @@ class Image
      *
      * @param string $fileName
      *
+     * @throws RuntimeException
+     *
      * @return resource
      */
     public function getImage($fileName)
     {
         $im = false;
         if (!file_exists($fileName)) {
-            return $im;
+            throw new RuntimeException(sprintf('File not found: %s', $fileName));
         }
+
         $size = getimagesize($fileName);
         switch ($size['mime']) {
             case 'image/jpeg':
@@ -297,6 +313,10 @@ class Image
             case 'image/x-ms-bmp':
                 $im = $this->createImageFromBmp($fileName);
                 break;
+        }
+
+        if (!is_resource($im)) {
+            throw new RuntimeException('Must be a resource');
         }
 
         return $im;
@@ -456,17 +476,15 @@ class Image
      * @param int $height
      * @param bool $sharpen
      *
-     * @throws Exception
+     * @throws RuntimeException
      *
      * @return bool
      */
     public function resizeFile($sourceFile, $destFile, $width, $height = null, $sharpen = true)
     {
         $image = $this->getImage($sourceFile);
-        if ($image === false) {
-            throw new Exception('Invalid image format');
-        }
         $image2 = $this->resizeImage($image, $width, $height, $sharpen);
+
         // save to file
         $result = imagejpeg($image2, $destFile, 100);
 
@@ -613,7 +631,7 @@ class Image
      * @param resource $imgBlur
      * @param int $w
      * @param int $h
-     * @param int $amount
+     * @param float $amount
      * @param int $threshold
      *
      * @return void
@@ -657,7 +675,7 @@ class Image
      * @param resource $imgBlur
      * @param int $w
      * @param int $h
-     * @param int $amount
+     * @param float $amount
      *
      * @return void
      */

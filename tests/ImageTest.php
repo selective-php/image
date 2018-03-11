@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 class ImageTest extends TestCase
 {
     /**
-     * Image calss.
+     * @var Image
      */
     protected $image;
 
@@ -75,18 +75,24 @@ class ImageTest extends TestCase
         $this->assertInternalType('string', $this->image->convertImageToBmp16($this->imgSrc));
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testConvertImageToBmp24WithInvalidImgResource()
     {
         $resource = 'invalid_img_resource';
 
-        $this::assertFalse($this->image->convertImageToBmp24($resource));
+        $this->image->convertImageToBmp24($resource);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testConvertImageToBmp16WithInvalidImgResource()
     {
         $resource = 'invalid_img_resource';
 
-        $this::assertFalse($this->image->convertImageToBmp16($resource));
+        $this->image->convertImageToBmp16($resource);
     }
 
     public function testGetImageData()
@@ -106,9 +112,16 @@ class ImageTest extends TestCase
         $this->assertInternalType('resource', $this->image->imageFromString($this->image->getImageData($this->imgSrc, 'jpg')));
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testConvertFileWithError()
+    {
+        $this->image->convertFile(__DIR__ . '/../composer.json', __DIR__ . '/dest_file');
+    }
+
     public function testConvertFile()
     {
-        $this::assertFalse($this->image->convertFile(__DIR__ . '/../composer.json', __DIR__ . '/dest_file'));
         $this::assertTrue($this->image->convertFile(__DIR__ . '/odan.jpg', __DIR__ . '/new_odan.jpg', 0));
     }
 
@@ -181,9 +194,12 @@ class ImageTest extends TestCase
         $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.jpg', 101);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testGetImageDataWithInvalidResource()
     {
-        $this::assertFalse($this->image->getImageData('invalid_img_resource', 'png'));
+        $this->image->getImageData('invalid_img_resource', 'png');
     }
 
     public function testResizeFileWithInvalidResource()
