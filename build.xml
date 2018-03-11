@@ -12,10 +12,12 @@
         </exec>
     </target>
 
-    <target name="phpunit-coverage" description="Run PHPUnit with coverage">
+    <target name="phpunit-coverage" description="Run unit tests with PHPUnit with coverage">
         <delete dir="${basedir}/build/coverage"/>
         <mkdir dir="${basedir}/build/coverage"/>
-        <exec executable="${basedir}/vendor/bin/phpunit${ext}" searchpath="true" resolveexecutable="true" failonerror="true" taskname="phpunit-coverage">
+        <exec executable="${basedir}/vendor/bin/phpunit${ext}" searchpath="true" resolveexecutable="true"
+              failonerror="true" taskname="phpunit-coverage">
+            <arg value="--coverage-text"/>
             <arg value="--configuration"/>
             <arg path="${basedir}/phpunit.xml"/>
             <arg value="--coverage-clover"/>
@@ -58,4 +60,7 @@
             <arg value="--no-progress"/>
         </exec>
     </target>
+
+    <target name="check-travis" depends="check-style,phpstan"/>
+
 </project>

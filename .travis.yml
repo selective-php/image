@@ -21,8 +21,9 @@ before_script:
 
 script:
   - ant check-style
-  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - ant phpstan
+  - ant phpunit-coverage
 
 after_success:
   - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi
