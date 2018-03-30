@@ -21,13 +21,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Odan\\Image\\": "src/Image",
-      "Odan\\Image\\Test\\": "tests"
+      "Odan\\Image\\": "src/Image"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "App\\Test\\": "tests"
+      "Odan\\Image\\Test\\": "tests"
     }
   },
   "config": {
