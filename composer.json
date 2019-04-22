@@ -12,7 +12,6 @@
         "ext-gd": "*"
     },
     "require-dev": {
-        "php": "^7.0",
         "phpunit/phpunit": "^6",
         "phpstan/phpstan": "^0.11"
     },
