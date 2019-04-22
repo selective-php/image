@@ -3,7 +3,9 @@
     "type": "library",
     "description": "Image library",
     "keywords": [
-        "library"
+        "image",
+        "picture",
+        "resize"
     ],
     "homepage": "https://github.com/selective-php/image",
     "license": "MIT",
