@@ -1,8 +1,8 @@
 <?php
 
-namespace Odan\Image\Test;
+namespace Selective\Image\Test;
 
-use Odan\Image\Image;
+use Selective\Image\Image;
 use PHPUnit\Framework\TestCase;
 
 /**

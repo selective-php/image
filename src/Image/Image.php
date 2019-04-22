@@ -1,6 +1,6 @@
 <?php
 
-namespace Odan\Image;
+namespace Selective\Image;
 
 use InvalidArgumentException;
 use RuntimeException;

@@ -1,35 +1,39 @@
 {
-  "name": "odan/image",
-  "type": "library",
-  "description": "Image library",
-  "keywords": [
-    "library"
-  ],
-  "homepage": "https://github.com/odan/image",
-  "license": "MIT",
-  "require": {
-    "php": "^7.0",
-    "ext-gd": "*"
-  },
-  "require-dev": {
-    "php": "^7.0",
-    "phpunit/phpunit": "^6"
-  },
-  "scripts": {
-    "check-style": "phpcs -p --standard=PSR2 --runtime-set ignore_warnings_on_exit 1 src tests",
-    "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_warnings_on_exit -n --no-patch 1 src tests"
-  },
-  "autoload": {
-    "psr-4": {
-      "Odan\\Image\\": "src/Image"
+    "name": "selective/image",
+    "type": "library",
+    "description": "Image library",
+    "keywords": [
+        "library"
+    ],
+    "homepage": "https://github.com/selective-php/image",
+    "license": "MIT",
+    "require": {
+        "php": "^7.0",
+        "ext-gd": "*"
+    },
+    "require-dev": {
+        "php": "^7.0",
+        "phpunit/phpunit": "^6",
+        "phpstan/phpstan": "^0.11"
+    },
+    "scripts": {
+        "test": "php vendor/phpunit/phpunit/phpunit",
+        "test-coverage": "php vendor/phpunit/phpunit/phpunit --coverage-clover build/logs/clover.xml --coverage-html build/coverage",
+        "check-style": "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
+        "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit -n src tests",
+        "phpstan": "php vendor/phpstan/phpstan/bin/phpstan analyse src tests --level=max -c phpstan.neon"
+    },
+    "autoload": {
+        "psr-4": {
+            "Selective\\Image\\": "src/Image"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Selective\\Image\\Test\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Odan\\Image\\Test\\": "tests"
-    }
-  },
-  "config": {
-    "sort-packages": true
-  }
 }

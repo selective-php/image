@@ -8,17 +8,12 @@ checks:
         duplication: true
 
 tools:
-    external_code_coverage:
-        timeout: 600
-        runs: 1
+    external_code_coverage: false
 
 build:
-    tests:
-        override:
-            command: "php -v"
     environment:
         php: 7.2
-        mysql: true
+        mysql: false
         node: false
         postgresql: false
         mongodb: false
@@ -27,3 +22,19 @@ build:
         memcached: false
         neo4j: false
         rabbitmq: false
+    nodes:
+        analysis:
+            tests:
+                override:
+                    - php-scrutinizer-run
+    dependencies:
+        before:
+            - composer self-update
+            - composer update --no-interaction --prefer-dist --no-progress
+    tests:
+        before:
+            -
+                command: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+                coverage:
+                    file: 'build/logs/clover.xml'
+                    format: 'clover'

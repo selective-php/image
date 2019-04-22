@@ -1,13 +1,13 @@
-# odan/image
+# selective/image
 
 Image manipulation library.
 
-[![Latest Version on Packagist](https://img.shields.io/github/release/odan/image.svg)](https://github.com/odan/image/releases)
+[![Latest Version on Packagist](https://img.shields.io/github/release/selective-php/image.svg)](https://packagist.org/packages/selective/image)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
-[![Build Status](https://travis-ci.org/odan/image.svg?branch=master)](https://travis-ci.org/odan/image)
-[![Code Coverage](https://scrutinizer-ci.com/g/odan/image/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/odan/image/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odan/image/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odan/image/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/odan/image.svg)](https://packagist.org/packages/odan/image)
+[![Build Status](https://travis-ci.org/selective-php/image.svg?branch=master)](https://travis-ci.org/selective-php/image)
+[![Coverage Status](https://scrutinizer-ci.com/g/selective-php/image/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective-php/image/code-structure)
+[![Quality Score](https://scrutinizer-ci.com/g/selective-php/image/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/image/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/selective/image.svg)](https://packagist.org/packages/selective/image/stats)
 
 
 ## Features
@@ -22,7 +22,7 @@ Image manipulation library.
 ## Installation
 
 ```
-composer require odan/image
+composer require selective/image
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ composer require odan/image
 Create the image resource.
 
 ```php
-$image = new Image();
+$image = new \Selective\Image\Image();
 
 $imgSrc = $image->getImage('/path/to/odan.jpg');
 ```
