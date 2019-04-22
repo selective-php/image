@@ -1,10 +1,16 @@
 language: php
 
 php:
-  - 7.0
   - 7.1
   - 7.2
   - 7.3
+
+dist: xenial
+
+addons:
+  apt:
+    packages:
+      - ant
 
 # This triggers builds to run on the new TravisCI infrastructure.
 # See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
@@ -21,10 +27,4 @@ before_script:
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  - ant check-style
-  - ant phpstan
-  - ant phpunit-coverage
-
-after_success:
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi
-  - if [ "$TRAVIS_PHP_VERSION" == "7.2" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi
+  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
