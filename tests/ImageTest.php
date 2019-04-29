@@ -2,8 +2,8 @@
 
 namespace Selective\Image\Test;
 
-use Selective\Image\Image;
 use PHPUnit\Framework\TestCase;
+use Selective\Image\Image;
 
 /**
  * ExampleTest.

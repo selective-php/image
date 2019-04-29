@@ -26,7 +26,9 @@ class Image
         $this->validateImageResource($image);
 
         $result = false;
-        $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        $extension = $this->getImageExtension($fileName);
+
         if ($extension !== 'png' && ($quality < 0 || $quality > 100)) {
             throw new InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 100.');
         }
@@ -52,6 +54,41 @@ class Image
         }
 
         return $result;
+    }
+
+    /**
+     * Get image extesnion
+     *
+     * @param string $fileName
+     *
+     * @return string
+     */
+    private function getImageExtension(string $fileName): string
+    {
+        $exifImageLists = [
+            IMAGETYPE_GIF => 'gif',
+            IMAGETYPE_JPEG => 'jpg',
+            IMAGETYPE_BMP => 'bmp',
+            IMAGETYPE_PNG => 'png',
+        ];
+
+        if (!file_exists(dirname($fileName))) {
+            throw new \InvalidArgumentException('The file ' . $fileName . 'is not existed');
+        }
+
+        if (function_exists('exif_imagetype') && file_exists($fileName)) {
+            $imageType = exif_imagetype($fileName);
+
+            if (!isset($exifImageLists[$imageType])) {
+                $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            } else {
+                $extension = $exifImageLists[$imageType];
+            }
+        } else {
+            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        }
+
+        return $extension;
     }
 
     /**
