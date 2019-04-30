@@ -2,6 +2,7 @@
 
 namespace Selective\Image\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Selective\Image\Image;
 
@@ -187,19 +188,9 @@ class ImageTest extends TestCase
         $this->image->copyImageResampled($resource, $resource, 0, 0, 0, 0, 0, 0, 0, 0, $quality = 3);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testConvertImageWithInvalidPngQuality()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.png');
-        $this->image->convertImage($this->image->getImage(__DIR__ . '/odan.png'), __DIR__ . '/new_odan.png', 100);
-    }
-
     public function testConvertImageWithInvalidJpgQuality()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.jpg', 101);
     }
 
