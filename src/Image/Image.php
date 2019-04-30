@@ -28,30 +28,24 @@ class Image
         }
 
         $this->validateImageResource($image);
-
-        $result = false;
-
         $extension = $this->getImageExtension($fileName);
 
         switch ($extension) {
             case 'jpeg':
             case 'jpg':
-                $result = imagejpeg($image, $fileName, $quality);
+                return imagejpeg($image, $fileName, $quality);
                 break;
             case 'gif':
-                $result = imagegif($image, $fileName);
+                return imagegif($image, $fileName);
                 break;
             case 'png':
-                $result = imagepng($image, $fileName, $this->getPngCompressionLevel($quality));
+                return imagepng($image, $fileName, $this->getPngCompressionLevel($quality));
                 break;
             case 'bmp':
-                $data = $this->convertImageToBmp24($image);
-                $status = file_put_contents($fileName, $data);
-                $result = ($status !== false);
-                break;
+                return file_put_contents($fileName, $this->convertImageToBmp24($image)) !== false;
         }
 
-        return $result;
+        throw new InvalidArgumentException(sprintf('Image format not supported: %s', $extension));
     }
 
     /**
