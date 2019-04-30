@@ -72,19 +72,17 @@ class Image
             IMAGETYPE_PNG => 'png',
         ];
 
-        if (!file_exists(dirname($fileName))) {
-            throw new \InvalidArgumentException('The file ' . $fileName . 'is not existed');
-        }
+        $extension = null;
 
         if (function_exists('exif_imagetype') && file_exists($fileName)) {
             $imageType = exif_imagetype($fileName);
 
-            if (!isset($exifImageLists[$imageType])) {
-                $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            } else {
+            if (isset($exifImageLists[$imageType])) {
                 $extension = $exifImageLists[$imageType];
             }
-        } else {
+        }
+
+        if($extension === null) {
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         }
 
