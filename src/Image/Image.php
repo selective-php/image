@@ -14,27 +14,25 @@ class Image
      * Save image object as file.
      *
      * @param resource $image Image resource
-     * @param int $quality
+     * @param int $quality The image quality in percent (0-100)
      * @param string $fileName Destination filename
      *
+     * @return bool
      * @throws RuntimeException
      *
-     * @return bool
      */
-    public function convertImage($image, $fileName, $quality = 100)
+    public function convertImage($image, string $fileName, int $quality = 100): bool
     {
+        if ($quality < 0 || $quality > 100) {
+            throw new InvalidArgumentException('The image quality must be between 0 and 100.');
+        }
+
         $this->validateImageResource($image);
 
         $result = false;
 
         $extension = $this->getImageExtension($fileName);
 
-        if ($extension !== 'png' && ($quality < 0 || $quality > 100)) {
-            throw new InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 100.');
-        }
-        if ($extension === 'png' && ($quality < 0 || $quality > 9)) {
-            throw new InvalidArgumentException('The ' . $extension . ' image quality should be 0 to 9.');
-        }
         switch ($extension) {
             case 'jpeg':
             case 'jpg':
@@ -44,7 +42,7 @@ class Image
                 $result = imagegif($image, $fileName);
                 break;
             case 'png':
-                $result = imagepng($image, $fileName, $quality);
+                $result = imagepng($image, $fileName, $this->getPngCompressionLevel($quality));
                 break;
             case 'bmp':
                 $data = $this->convertImageToBmp24($image);
@@ -54,6 +52,21 @@ class Image
         }
 
         return $result;
+    }
+
+    /**
+     * Convert percent to png compresion level from 0 (no compression = 100%) to 9 (max compression = 0%).
+     *
+     * @param int $percent percent (higher is better quality)
+     *
+     * @return int png compression level (lower is better quality)
+     */
+    private function getPngCompressionLevel(int $percent): int
+    {
+        // Round percent
+        $percent = $percent === 0 ? 0 : $percent < 5 ? 10 : round($percent / 10) * 10;
+
+        return (int)round(($percent * 9) / 100);
     }
 
     /**
@@ -82,7 +95,7 @@ class Image
             }
         }
 
-        if($extension === null) {
+        if ($extension === null) {
             $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         }
 
@@ -94,9 +107,9 @@ class Image
      *
      * @param resource $im
      *
-     * @throws RuntimeException
-     *
      * @return string $result binary data
+     *
+     * @throws RuntimeException
      *
      * @see http://www.codingforums.com/archive/index.php/t-157438.html
      */
@@ -144,9 +157,9 @@ class Image
      *
      * @param resource $im Image resource
      *
+     * @return string $result binary data
      * @throws RuntimeException
      *
-     * @return string $result binary data
      */
     public function convertImageToBmp16(&$im)
     {
@@ -201,7 +214,7 @@ class Image
      *
      * @return bool True
      */
-    protected function validateImageResource($image)
+    protected function validateImageResource($image): bool
     {
         if (empty($image) || !is_resource($image) || get_resource_type($image) !== 'gd') {
             throw new RuntimeException('Image must be a valid image resource');
@@ -216,9 +229,9 @@ class Image
      * @param resource $im
      * @param string $type data type (jpg, png, gif, bmp)
      *
+     * @return string
      * @throws RuntimeException
      *
-     * @return string
      */
     public function getImageData($im, string $type = 'jpg')
     {
@@ -261,9 +274,9 @@ class Image
      * @param string $destFile
      * @param int $quality
      *
+     * @return bool
      * @throws RuntimeException
      *
-     * @return bool
      */
     public function convertFile($sourceFile, $destFile, $quality = 100)
     {
@@ -334,9 +347,9 @@ class Image
      *
      * @param string $fileName
      *
+     * @return resource
      * @throws RuntimeException
      *
-     * @return resource
      */
     public function getImage($fileName)
     {
@@ -522,9 +535,9 @@ class Image
      * @param int $height
      * @param bool $sharpen
      *
+     * @return bool
      * @throws RuntimeException
      *
-     * @return bool
      */
     public function resizeFile($sourceFile, $destFile, $width, $height = null, $sharpen = true)
     {
