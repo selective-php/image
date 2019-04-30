@@ -13,8 +13,11 @@
         "php": "^7.1",
         "ext-gd": "*"
     },
+    "suggest": {
+        "ext-exif": "It can detect image extension correctly"
+    },
     "require-dev": {
-        "phpunit/phpunit": "^6",
+        "phpunit/phpunit": "^7",
         "phpstan/phpstan": "^0.11"
     },
     "scripts": {
