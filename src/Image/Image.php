@@ -436,7 +436,7 @@ class Image
                     $color = unpack('n', $vide . substr($img, $p, 1));
                     $color[1] = $palette[$color[1] + 1];
                 } elseif ($bmp['bits_per_pixel'] == 4) {
-                    $color = unpack('n', $vide . substr($img, floor($p), 1));
+                    $color = unpack('n', $vide . substr($img, (int)floor($p), 1));
                     if (($p * 2) % 2 == 0) {
                         $color[1] = ($color[1] >> 4);
                     } else {
@@ -444,7 +444,7 @@ class Image
                     }
                     $color[1] = $palette[$color[1] + 1];
                 } elseif ($bmp['bits_per_pixel'] == 1) {
-                    $color = unpack('n', $vide . substr($img, floor($p), 1));
+                    $color = unpack('n', $vide . substr($img, (int)floor($p), 1));
                     if (($p * 8) % 8 == 0) {
                         $color[1] = $color[1] >> 7;
                     } elseif (($p * 8) % 8 == 1) {

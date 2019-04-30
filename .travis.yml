@@ -7,25 +7,19 @@ php:
 
 dist: xenial
 
-addons:
-  apt:
-    packages:
-      - ant
-
-# This triggers builds to run on the new TravisCI infrastructure.
-# See: http://docs.travis-ci.com/user/workers/container-based-infrastructure/
-sudo: false
-  
-## Cache composer
 cache:
   directories:
     - $HOME/.composer/cache
 
 before_script:
-  - travis_retry composer self-update
-  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-dist
+  - composer self-update
+  - composer install --no-interaction --prefer-dist
   - cd $TRAVIS_BUILD_DIR
 
 script:
-  - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - composer lint
+  - composer install-cs-fixer
+  - composer check-style
+  - composer phpstan
+  - composer test-coverage
 
