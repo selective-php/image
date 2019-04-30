@@ -17,7 +17,11 @@ Image manipulation library.
 
 ## Requirements
 
-* The ```GD``` extension
+* The `GD` extension
+
+## Recommended
+
+* The `exif` extension, for better detection of the image format
 
 ## Installation
 
@@ -32,21 +36,20 @@ Create the image resource.
 ```php
 $image = new \Selective\Image\Image();
 
-$imgSrc = $image->getImage('/path/to/odan.jpg');
+$imageResource = $image->getImage('/path/to/file.jpg');
 ```
 
-Convert the image to the specific image type and get converted image data string.
+Encodes the given image resource into given format/quality 
+and save the the new image in filesystem.
 
 ```php
-$image->convertImage($imgSrc, '/path/to/odan.png', 0);
-$imageData = $image->getImageData($imgSrc, 'png'));
+$image->convertImage($imageResource, '/path/to/new-file.png', 100);
 ```
 
-Convert the image to the specific image type and get converted image data string.
+Get the content of the given image resource.
 
 ```php
-$image->convertImage($imgSrc, '/path/to/odan.png', 0);
-$imageResource = $image->getImage('/path/to/odan.png');
+$content = $image->getImageData($imageResource);
 ```
 
-If you want more details and examples about usage, please read the [documentation](docs/README.md).
+If you want more details and examples about the usage, please read the [documentation](docs/README.md).
