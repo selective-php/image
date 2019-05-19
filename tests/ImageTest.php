@@ -124,6 +124,21 @@ class ImageTest extends TestCase
         $this->assertFileExists($destination);
         Image::createFromFile($destination);
 
+        // Timeout
+        //Image::createFromFile($source)->watermark($watermark, ['sharpen' => true])->save($destination);
+        //$this->assertFileExists($destination);
+        //Image::createFromFile($destination);
+    }
+
+    /**
+     * @dataProvider watermarkProvider
+     *
+     * @param string $source
+     * @param string $watermark
+     * @param string $destination
+     */
+    public function testWatermark2(string $source, string $watermark, string $destination)
+    {
         Image::createFromFile($source)->watermark($watermark, ['sharpen' => true])->save($destination);
         $this->assertFileExists($destination);
         Image::createFromFile($destination);

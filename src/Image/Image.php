@@ -576,9 +576,9 @@ class Image
      * @param int $height
      * @param bool $sharpen
      *
-     * @return bool success
+     * @return self
      */
-    public function resize(int $width, int $height = null, bool $sharpen = true): bool
+    public function resize(int $width, int $height = null, bool $sharpen = true): self
     {
         $this->image = $this->resizeImage($this->image, $width, $height, $sharpen);
 
