@@ -26,10 +26,10 @@ class ImageTest extends TestCase
      */
     protected function tearDown()
     {
-       @unlink(__DIR__ . '/new_example.png');
-       @unlink(__DIR__ . '/new_example.jpg');
-       @unlink(__DIR__ . '/new_example.gif');
-       @unlink(__DIR__ . '/new_example.bmp');
+        @unlink(__DIR__ . '/new_example.png');
+        @unlink(__DIR__ . '/new_example.jpg');
+        @unlink(__DIR__ . '/new_example.gif');
+        @unlink(__DIR__ . '/new_example.bmp');
     }
 
     /**
@@ -67,6 +67,9 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider saveProvider
+     *
+     * @param string $source
+     * @param string $destination
      */
     public function testSave(string $source, string $destination)
     {
@@ -100,7 +103,7 @@ class ImageTest extends TestCase
                     $result[] = [
                         __DIR__ . '/example.' . $extension,
                         __DIR__ . '/watermark.' . $extension2,
-                        __DIR__ . '/new_example.' . $extension3];
+                        __DIR__ . '/new_example.' . $extension3, ];
                 }
             }
         }
@@ -110,6 +113,10 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider watermarkProvider
+     *
+     * @param string $source
+     * @param string $watermark
+     * @param string $destination
      */
     public function testWatermark(string $source, string $watermark, string $destination)
     {
@@ -124,6 +131,9 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider saveBmp16BitProvider
+     *
+     * @param string $source
+     * @param string $destination
      */
     public function testSaveBmp16Bit(string $source, string $destination)
     {

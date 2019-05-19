@@ -20,11 +20,11 @@ class Image
      *
      * @param string $fileName The output file
      * @param int $quality The image quality in percent (0-100)
-     * @param int $bit 24 or 16 bit (bmp only).
+     * @param int $bit 24 or 16 bit (bmp only)
      *
-     * @return self
      * @throws InvalidArgumentException
      *
+     * @return self
      */
     public function save(string $fileName, int $quality = 100, int $bit = 24): self
     {
@@ -47,19 +47,18 @@ class Image
                 imagepng($this->image, $fileName, $this->getPngCompressionLevel($quality));
                 break;
             case 'bmp':
-                {
+
                    file_put_contents(
                         $fileName,
                         $bit === 16 ? $this->convertImageToBmp16($this->image) : $this->convertImageToBmp24($this->image)
                     );
                     break;
-                }
+
             default:
                 throw new InvalidArgumentException(sprintf('Image format not supported: %s', $extension));
         }
 
         return $this;
-
     }
 
     /**
@@ -115,9 +114,9 @@ class Image
      *
      * @param resource $image
      *
-     * @return string $result binary data
      * @throws RuntimeException
      *
+     * @return string $result binary data
      */
     private function convertImageToBmp24(&$image): string
     {
@@ -163,9 +162,9 @@ class Image
      *
      * @param resource $im Image resource
      *
-     * @return string $result binary data
      * @throws RuntimeException
      *
+     * @return string $result binary data
      */
     private function convertImageToBmp16(&$im): string
     {
@@ -216,9 +215,9 @@ class Image
      *
      * @param resource|mixed $image Image
      *
-     * @return bool True
      * @throws RuntimeException
      *
+     * @return bool True
      */
     private function validateImageResource($image): bool
     {
@@ -375,10 +374,9 @@ class Image
      *
      * @param string $fileName
      *
-     * @return resource The image resource
-     *
      * @throws RuntimeException
      *
+     * @return resource The image resource
      */
     private function createFromBmp(string $fileName)
     {
