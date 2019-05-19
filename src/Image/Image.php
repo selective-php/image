@@ -11,41 +11,55 @@ use RuntimeException;
 class Image
 {
     /**
+     * @var resource
+     */
+    private $image;
+
+    /**
      * Save image object as file.
      *
-     * @param resource $image Image resource
+     * @param string $fileName The output file
      * @param int $quality The image quality in percent (0-100)
-     * @param string $fileName Destination filename
+     * @param int $bit 24 or 16 bit (bmp only).
      *
-     * @throws RuntimeException
+     * @return self
+     * @throws InvalidArgumentException
      *
-     * @return bool
      */
-    public function convertImage($image, string $fileName, int $quality = 100): bool
+    public function save(string $fileName, int $quality = 100, int $bit = 24): self
     {
         if ($quality < 0 || $quality > 100) {
             throw new InvalidArgumentException('The image quality must be between 0 and 100.');
         }
 
-        $this->validateImageResource($image);
+        $this->validateImageResource($this->image);
         $extension = $this->getImageExtension($fileName);
 
         switch ($extension) {
             case 'jpeg':
             case 'jpg':
-                return imagejpeg($image, $fileName, $quality);
+                imagejpeg($this->image, $fileName, $quality);
                 break;
             case 'gif':
-                return imagegif($image, $fileName);
+                imagegif($this->image, $fileName);
                 break;
             case 'png':
-                return imagepng($image, $fileName, $this->getPngCompressionLevel($quality));
+                imagepng($this->image, $fileName, $this->getPngCompressionLevel($quality));
                 break;
             case 'bmp':
-                return file_put_contents($fileName, $this->convertImageToBmp24($image)) !== false;
+                {
+                   file_put_contents(
+                        $fileName,
+                        $bit === 16 ? $this->convertImageToBmp16($this->image) : $this->convertImageToBmp24($this->image)
+                    );
+                    break;
+                }
+            default:
+                throw new InvalidArgumentException(sprintf('Image format not supported: %s', $extension));
         }
 
-        throw new InvalidArgumentException(sprintf('Image format not supported: %s', $extension));
+        return $this;
+
     }
 
     /**
@@ -101,11 +115,11 @@ class Image
      *
      * @param resource $image
      *
+     * @return string $result binary data
      * @throws RuntimeException
      *
-     * @return string $result binary data
      */
-    public function convertImageToBmp24(&$image): string
+    private function convertImageToBmp24(&$image): string
     {
         $this->validateImageResource($image);
 
@@ -149,11 +163,11 @@ class Image
      *
      * @param resource $im Image resource
      *
+     * @return string $result binary data
      * @throws RuntimeException
      *
-     * @return string $result binary data
      */
-    public function convertImageToBmp16(&$im): string
+    private function convertImageToBmp16(&$im): string
     {
         $this->validateImageResource($im);
 
@@ -202,11 +216,11 @@ class Image
      *
      * @param resource|mixed $image Image
      *
+     * @return bool True
      * @throws RuntimeException
      *
-     * @return bool True
      */
-    protected function validateImageResource($image): bool
+    private function validateImageResource($image): bool
     {
         if (empty($image) || !is_resource($image) || get_resource_type($image) !== 'gd') {
             throw new RuntimeException('Image must be a valid image resource');
@@ -216,77 +230,60 @@ class Image
     }
 
     /**
-     * Returns image binary data from image resource.
+     * Returns image from string.
      *
-     * @param resource $image the image
-     * @param string $type data type (jpg, png, gif, bmp)
+     * @param string $data String containing the image data
      *
-     * @throws RuntimeException
-     *
-     * @return string the image content
+     * @return self
      */
-    public function getImageData($image, string $type = 'jpg'): string
+    public static function createFromString(string $data): self
     {
-        $this->validateImageResource($image);
+        $resource = imagecreatefromstring($data);
 
-        ob_start();
-        if ($type == 'jpg') {
-            imagejpeg($image);
-        }
-        if ($type == 'png') {
-            imagepng($image);
-        }
-        if ($type == 'gif') {
-            imagegif($image);
-        }
-        if ($type == 'bmp') {
-            imagewbmp($image);
-        }
-        $result = ob_get_clean();
+        $image = new self();
+        $image->image = $resource;
 
-        if ($result === false) {
-            throw new RuntimeException('Reading image data failed');
-        }
-
-        return $result;
+        return $image;
     }
 
     /**
      * Returns image from string.
      *
-     * @param string $data String containing the image data
+     * @param string $filename
      *
-     * @return resource the image
+     * @return self
      */
-    public function imageFromString(string $data)
+    public static function createFromFile(string $filename): self
     {
-        return imagecreatefromstring($data);
+        return static::createFromString(file_get_contents($filename));
     }
 
     /**
-     * Converto image file to new format.
+     * Returns image from a resource.
      *
-     * @param string $sourceFile source file
-     * @param string $outputFile destination / output file
-     * @param int $quality image quality (0-100)
+     * @param resource $resource The image resource
      *
-     * @return bool Succes
+     * @return self
      */
-    public function convertFile(string $sourceFile, string $outputFile, int $quality = 100): bool
+    public static function createFromResource($resource): self
     {
-        return $this->convertImage($this->getImage($sourceFile), $outputFile, $quality);
+        $image = new self();
+        $image->validateImageResource($resource);
+
+        $image->image = $resource;
+
+        return $image;
     }
 
     /**
      * Add watermark to image.
      *
-     * @param string $backgroundFile background image filename
      * @param string $watermarkFile watermark image filename
      * @param array $params optional parameters
      *
-     * @return resource image
+     * @return self
      */
-    public function addWatermark($backgroundFile, $watermarkFile, array $params = [])
+    public function watermark(string $watermarkFile, array $params = []): self
     {
         $width = $params['w'] ?? 1024;
         $height = $params['h'] ?? null;
@@ -294,8 +291,8 @@ class Image
         $topPercent = $params['top_percent'] ?? 5;
         $leftPercent = $params['left_percent'] ?? 5;
 
-        $imageWatermark = $this->getImage($watermarkFile);
-        $imageBackground = $this->getImage($backgroundFile);
+        $imageWatermark = $this->getImageResource($watermarkFile);
+        $imageBackground = $this->image;
 
         $imageBackground = $this->resizeImage($imageBackground, $width, $height, false);
 
@@ -329,7 +326,9 @@ class Image
             $out = $this->unsharpMask($out, $amount, $radius, $threshold);
         }
 
-        return $out;
+        $this->image = $out;
+
+        return $this;
     }
 
     /**
@@ -341,7 +340,7 @@ class Image
      *
      * @return resource
      */
-    public function getImage(string $fileName)
+    private function getImageResource(string $fileName)
     {
         if (!file_exists($fileName)) {
             throw new RuntimeException(sprintf('File not found: %s', $fileName));
@@ -362,7 +361,7 @@ class Image
                 break;
             case 'image/bmp':
             case 'image/x-ms-bmp':
-                $image = $this->createImageFromBmp($fileName);
+                $image = $this->createFromBmp($fileName);
                 break;
         }
 
@@ -376,11 +375,12 @@ class Image
      *
      * @param string $fileName
      *
+     * @return resource The image resource
+     *
      * @throws RuntimeException
      *
-     * @return resource
      */
-    public function createImageFromBmp(string $fileName)
+    private function createFromBmp(string $fileName)
     {
         // open the file in binary mode
         if (!$f1 = @fopen($fileName, 'rb')) {
@@ -490,7 +490,7 @@ class Image
      *
      * @return resource
      */
-    public function resizeImage($image, int $width, int $height = null, bool $sharpen = true)
+    private function resizeImage($image, int $width, int $height = null, bool $sharpen = true)
     {
         $widthOrig = imagesx($image);
         $heightOrig = imagesy($image);
@@ -517,26 +517,6 @@ class Image
         }
 
         return $imageP;
-    }
-
-    /**
-     * Resize image.
-     *
-     * @param string $sourceFile
-     * @param string $destFile
-     * @param int $width
-     * @param int $height
-     * @param bool $sharpen
-     *
-     * @return bool success
-     */
-    public function resizeFile(string $sourceFile, string $destFile, int $width, int $height = null, bool $sharpen = true): bool
-    {
-        $image = $this->getImage($sourceFile);
-        $image2 = $this->resizeImage($image, $width, $height, $sharpen);
-
-        // save to file
-        return imagejpeg($image2, $destFile, 100);
     }
 
     /**
@@ -570,7 +550,7 @@ class Image
      *
      * @return bool success
      */
-    public function copyImageResampled(&$dstImage, &$srcImage, int $dstX, int $dstY, int $srcX, int $srcY, int $dstW, int $dstH, int $srcW, int $srcH, int $quality = 3): bool
+    private function copyImageResampled(&$dstImage, &$srcImage, int $dstX, int $dstY, int $srcX, int $srcY, int $dstW, int $dstH, int $srcW, int $srcH, int $quality = 3): bool
     {
         $this->validateImageResource($dstImage);
         $this->validateImageResource($srcImage);
@@ -589,6 +569,22 @@ class Image
         }
 
         return true;
+    }
+
+    /**
+     * Resize image.
+     *
+     * @param int $width
+     * @param int $height
+     * @param bool $sharpen
+     *
+     * @return bool success
+     */
+    public function resize(int $width, int $height = null, bool $sharpen = true): bool
+    {
+        $this->image = $this->resizeImage($this->image, $width, $height, $sharpen);
+
+        return $this;
     }
 
     /**
@@ -628,7 +624,7 @@ class Image
      *
      * @return resource
      */
-    protected function unsharpMask($image, float $amount, float $radius, int $threshold)
+    private function unsharpMask($image, float $amount, float $radius, int $threshold)
     {
         // Attempt to calibrate the parameters to photoshop
         if ($amount > 500) {
@@ -686,7 +682,7 @@ class Image
      *
      * @return void
      */
-    protected function calcDifferenceBlurredThreshold(&$image, &$imageBlur, int $width, int $height, float $amount, int $threshold): void
+    private function calcDifferenceBlurredThreshold(&$image, &$imageBlur, int $width, int $height, float $amount, int $threshold): void
     {
         for ($x = 0; $x < $width - 1; $x++) {
             // each row
@@ -729,7 +725,7 @@ class Image
      *
      * @return void
      */
-    protected function calcDifferenceBlurred(&$img, &$imgBlur, int $width, int $height, float $amount): void
+    private function calcDifferenceBlurred(&$img, &$imgBlur, int $width, int $height, float $amount): void
     {
         for ($x = 0; $x < $width; $x++) {
             // each row
@@ -773,12 +769,12 @@ class Image
     /**
      * Destroy image resource.
      *
-     * @param resource $image image
-     *
-     * @return bool Success
+     * @return void
      */
-    public function destroy($image): bool
+    public function __destruct()
     {
-        return imagedestroy($image);
+        if ($this->image !== null && is_resource($this->image)) {
+            @imagedestroy($this->image);
+        }
     }
 }

@@ -2,25 +2,14 @@
 
 namespace Selective\Image\Test;
 
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Selective\Image\Image;
 
 /**
- * ExampleTest.
+ * Test.
  */
 class ImageTest extends TestCase
 {
-    /**
-     * @var Image|null
-     */
-    protected $image;
-
-    /**
-     * Image resource|null.
-     */
-    protected $imgSrc;
-
     /**
      * Set up this test.
      *
@@ -28,8 +17,6 @@ class ImageTest extends TestCase
      */
     protected function setUp()
     {
-        $this->image = new Image();
-        $this->imgSrc = $this->image->getImage(__DIR__ . '/odan.jpg');
     }
 
     /**
@@ -39,13 +26,10 @@ class ImageTest extends TestCase
      */
     protected function tearDown()
     {
-        @unlink(__DIR__ . '/odan.png');
-        @unlink(__DIR__ . '/odan.gif');
-        @unlink(__DIR__ . '/odan.bmp');
-        @unlink(__DIR__ . '/new_odan.png');
-        @unlink(__DIR__ . '/new_odan.jpg');
-        $this->image = null;
-        $this->imgSrc = null;
+       @unlink(__DIR__ . '/new_example.png');
+       @unlink(__DIR__ . '/new_example.jpg');
+       @unlink(__DIR__ . '/new_example.gif');
+       @unlink(__DIR__ . '/new_example.bmp');
     }
 
     /**
@@ -53,159 +37,115 @@ class ImageTest extends TestCase
      *
      * @return void
      */
-    public function testImageClassInstance()
+    public function testCreateFromFile()
     {
-        $this->assertInstanceOf(Image::class, $this->image);
-    }
+        Image::createFromFile(__DIR__ . '/example.png');
+        Image::createFromFile(__DIR__ . '/example.gif');
+        Image::createFromFile(__DIR__ . '/example.jpg');
+        Image::createFromFile(__DIR__ . '/example.bmp');
 
-    public function testConvertImageShouldReturnTrue()
-    {
-        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__ . '/odan.png', 0));
-        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__ . '/odan.gif'));
-        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__ . '/new_odan.jpg', 8));
-        $this::assertTrue($this->image->convertImage($this->imgSrc, __DIR__ . '/odan.bmp'));
-    }
-
-    public function testConvertImageToBmp24()
-    {
-        $this->assertInternalType('string', $this->image->convertImageToBmp24($this->imgSrc));
-    }
-
-    public function testConvertImageToBmp16()
-    {
-        $this->assertInternalType('string', $this->image->convertImageToBmp16($this->imgSrc));
+        $this->assertTrue(true);
     }
 
     /**
-     * @expectedException \RuntimeException
+     * Test create object.
+     *
+     * @return void
      */
-    public function testConvertImageToBmp24WithInvalidImgResource()
+    public function testCreateFromResource()
     {
-        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
-        $this->image->convertImageToBmp24($resource);
+        Image::createFromResource(imagecreate(100, 100));
+
+        $this->assertTrue(true);
+    }
+
+    public function testCreateFromResourceWithInvalidResource()
+    {
+        $this->expectException(\RuntimeException::class);
+        Image::createFromResource(fopen('data://text/plain,invalid_img_resource', 'r'));
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @dataProvider saveProvider
      */
-    public function testConvertImageToBmp16WithInvalidImgResource()
+    public function testSave(string $source, string $destination)
     {
-        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
-        $this->image->convertImageToBmp16($resource);
+        Image::createFromFile($source)->save($destination);
+        $this->assertFileExists($destination);
+        Image::createFromFile($destination);
     }
 
-    public function testGetImageData()
+    public function saveProvider(): array
     {
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.png', 0);
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.bmp');
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.gif');
+        $result = [];
+        $extensions = ['png', 'gif', 'jpg', 'bmp'];
 
-        $this->assertInternalType('string', $this->image->getImageData($this->imgSrc, 'jpg'));
-        $this->assertInternalType('string', $this->image->getImageData($this->image->getImage(__DIR__ . '/odan.jpg'), 'jpg'));
-        $this->assertInternalType('string', $this->image->getImageData($this->image->getImage(__DIR__ . '/odan.gif'), 'gif'));
-        $this->assertInternalType('string', $this->image->getImageData($this->image->getImage(__DIR__ . '/odan.bmp'), 'bmp'));
+        foreach ($extensions as $extension) {
+            foreach ($extensions as $extension2) {
+                $result[] = [__DIR__ . '/example.' . $extension, __DIR__ . '/new_example.' . $extension2];
+            }
+        }
+
+        return $result;
     }
 
-    public function testImageFromString()
+    public function watermarkProvider(): array
     {
-        $this->assertInternalType('resource', $this->image->imageFromString($this->image->getImageData($this->imgSrc, 'jpg')));
+        $result = [];
+        $extensions = ['png', 'gif', 'jpg', 'bmp'];
+
+        foreach ($extensions as $extension) {
+            foreach ($extensions as $extension2) {
+                foreach ($extensions as $extension3) {
+                    $result[] = [
+                        __DIR__ . '/example.' . $extension,
+                        __DIR__ . '/watermark.' . $extension2,
+                        __DIR__ . '/new_example.' . $extension3];
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @dataProvider watermarkProvider
      */
-    public function testConvertFileWithError()
+    public function testWatermark(string $source, string $watermark, string $destination)
     {
-        $this->image->convertFile(__DIR__ . '/../composer.json', __DIR__ . '/dest_file');
-    }
+        Image::createFromFile($source)->watermark($watermark)->save($destination);
+        $this->assertFileExists($destination);
+        Image::createFromFile($destination);
 
-    public function testConvertFile()
-    {
-        $this::assertTrue($this->image->convertFile(__DIR__ . '/odan.jpg', __DIR__ . '/new_odan.jpg', 0));
-    }
-
-    public function testAddWatermark()
-    {
-        $this->assertInternalType('resource', $this->image->addWatermark(__DIR__ . '/odan.jpg', __DIR__ . '/background.jpeg', ['sharpen' => true]));
-    }
-
-    public function testGetImage()
-    {
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.png', 0);
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.gif');
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.bmp');
-
-        $this->assertInternalType('resource', $this->image->getImage(__DIR__ . '/odan.png'));
-        $this->assertInternalType('resource', $this->image->getImage(__DIR__ . '/odan.gif'));
-        $this->assertInternalType('resource', $this->image->getImage(__DIR__ . '/odan.jpg'));
-        $this->assertInternalType('resource', $this->image->getImage(__DIR__ . '/odan.bmp'));
-    }
-
-    public function testCreateImageFromBmp()
-    {
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.bmp');
-
-        $this->assertInternalType('resource', $this->image->createImageFromBmp(__DIR__ . '/odan.bmp'));
+        Image::createFromFile($source)->watermark($watermark, ['sharpen' => true])->save($destination);
+        $this->assertFileExists($destination);
+        Image::createFromFile($destination);
     }
 
     /**
-     * @expectedException \RuntimeException
+     * @dataProvider saveBmp16BitProvider
      */
-    public function testCreateImageFromBmpWithInvalidFileType()
+    public function testSaveBmp16Bit(string $source, string $destination)
     {
-        $this->image->createImageFromBmp(__DIR__ . '/odan.jpg');
+        Image::createFromFile($source)->save($destination, 100, 16);
+        $this->assertFileExists($destination);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testCreateImageFromBmpWithInvalidImageFile()
+    public function saveBmp16BitProvider(): array
     {
-        $this->image->createImageFromBmp('invalid_image_file');
+        $result = [];
+        $extensions = ['png', 'gif', 'jpg', 'bmp'];
+
+        foreach ($extensions as $extension) {
+            $result[] = [__DIR__ . '/example.' . $extension, __DIR__ . '/new_example.bmp'];
+        }
+
+        return $result;
     }
 
-    public function testResizeImage()
+    public function testResize()
     {
-        $this->assertInternalType('resource', $this->image->resizeImage($this->image->getImage(__DIR__ . '/odan.jpg'), 100));
-    }
-
-    public function testResizeFile()
-    {
-        $this::assertTrue($this->image->resizeFile(__DIR__ . '/odan.jpg', __DIR__ . '/new_odan.jpg', 100));
-    }
-
-    public function testDestroy()
-    {
-        $this::assertTrue($this->image->destroy($this->image->getImage(__DIR__ . '/odan.jpg')));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testCopyImageResampledWithInvalidImageResource()
-    {
-        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
-        $this->image->copyImageResampled($resource, $resource, 0, 0, 0, 0, 0, 0, 0, 0, $quality = 3);
-    }
-
-    public function testConvertImageWithInvalidJpgQuality()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->image->convertImage($this->imgSrc, __DIR__ . '/odan.jpg', 101);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testGetImageDataWithInvalidResource()
-    {
-        $resource = fopen('data://text/plain,invalid_img_resource', 'r');
-        $this->image->getImageData($resource, 'png');
-    }
-
-    public function testResizeFileWithInvalidResource()
-    {
-        $this->expectException(\Exception::class);
-        $this->image->resizeFile('invalid_img', __DIR__ . '/new_odan.jpg', 100);
+        // todo
+        $this->assertTrue(true);
     }
 }
