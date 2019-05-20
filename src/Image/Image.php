@@ -284,16 +284,12 @@ class Image
      */
     public function watermark(string $watermarkFile, array $params = []): self
     {
-        $width = $params['w'] ?? 1024;
-        $height = $params['h'] ?? null;
+        $imgToTop = $params['top'] ?? 0;
+        $imgToLeft = $params['left'] ?? 0;
         $sharpen = $params['sharpen'] ?? false;
-        $topPercent = $params['top_percent'] ?? 5;
-        $leftPercent = $params['left_percent'] ?? 5;
 
         $imageWatermark = $this->getImageResource($watermarkFile);
         $imageBackground = $this->image;
-
-        $imageBackground = $this->resizeImage($imageBackground, $width, $height, false);
 
         $srcW = imagesx($imageBackground);
         $srcH = imagesy($imageBackground);
@@ -306,9 +302,6 @@ class Image
 
         $dstPngW = $srcW / 3;
         $dstPngH = (int)($srcPngH * $dstPngW / $srcPngW);
-
-        $imgToLeft = ($dstW / 100) * $leftPercent;
-        $imgToTop = ($dstH / 100) * $topPercent;
 
         $out = imagecreatetruecolor($dstW, $dstH);
 

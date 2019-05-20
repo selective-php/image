@@ -26,10 +26,10 @@ class ImageTest extends TestCase
      */
     protected function tearDown()
     {
-        @unlink(__DIR__ . '/new_example.png');
-        @unlink(__DIR__ . '/new_example.jpg');
-        @unlink(__DIR__ . '/new_example.gif');
-        @unlink(__DIR__ . '/new_example.bmp');
+       # @unlink(__DIR__ . '/new_example.png');
+       # @unlink(__DIR__ . '/new_example.jpg');
+       # @unlink(__DIR__ . '/new_example.gif');
+       # @unlink(__DIR__ . '/new_example.bmp');
     }
 
     /**
@@ -103,7 +103,7 @@ class ImageTest extends TestCase
                     $result[] = [
                         __DIR__ . '/example.' . $extension,
                         __DIR__ . '/watermark.' . $extension2,
-                        __DIR__ . '/new_example.' . $extension3, ];
+                        __DIR__ . '/new_example.' . $extension3,];
                 }
             }
         }
@@ -123,25 +123,37 @@ class ImageTest extends TestCase
         Image::createFromFile($source)->watermark($watermark)->save($destination);
         $this->assertFileExists($destination);
         Image::createFromFile($destination);
-
-        // Timeout
-        //Image::createFromFile($source)->watermark($watermark, ['sharpen' => true])->save($destination);
-        //$this->assertFileExists($destination);
-        //Image::createFromFile($destination);
     }
 
     /**
-     * @dataProvider watermarkProvider
+     * @dataProvider watermarkSharpenProvider
      *
      * @param string $source
      * @param string $watermark
      * @param string $destination
      */
-    public function testWatermark2(string $source, string $watermark, string $destination)
+    public function testWatermarkWithSharpen(string $source, string $watermark, string $destination)
     {
         Image::createFromFile($source)->watermark($watermark, ['sharpen' => true])->save($destination);
         $this->assertFileExists($destination);
         Image::createFromFile($destination);
+    }
+
+    public function watermarkSharpenProvider(): array
+    {
+        $result = [];
+        $extensions = ['png', 'gif', 'jpg', 'bmp'];
+
+        foreach ($extensions as $extension) {
+            foreach ($extensions as $extension2) {
+                $result[] = [
+                    __DIR__ . '/example.' . $extension,
+                    __DIR__ . '/watermark.' . $extension,
+                    __DIR__ . '/new_example.' . $extension2,];
+            }
+        }
+
+        return $result;
     }
 
     /**
