@@ -14,8 +14,6 @@ cache:
 before_script:
   - composer self-update
   - composer install --no-interaction --prefer-dist
-  #- composer config process-timeout 2000
-  #- export COMPOSER_PROCESS_TIMEOUT=2000
   - cd $TRAVIS_BUILD_DIR
 
 script:
