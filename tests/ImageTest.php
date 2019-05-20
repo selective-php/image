@@ -79,6 +79,7 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider saveProvider
+     * @large
      *
      * @param string $source
      * @param string $destination
@@ -125,6 +126,7 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider watermarkProvider
+     * @large
      *
      * @param string $source
      * @param string $watermark
@@ -139,6 +141,7 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider watermarkSharpenProvider
+     * @large
      *
      * @param string $source
      * @param string $watermark
@@ -170,6 +173,7 @@ class ImageTest extends TestCase
 
     /**
      * @dataProvider saveBmp16BitProvider
+     * @large
      *
      * @param string $source
      * @param string $destination
