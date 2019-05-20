@@ -51,6 +51,10 @@ class ImageTest extends TestCase
         $data = base64_decode($data);
 
         $this->assertIsResource(imagecreatefromstring($data) ?: false);
+        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.png')) ?: false);
+        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.jpg')) ?: false);
+        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.gif')) ?: false);
+        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.bmp')) ?: false);
     }
 
     /**
