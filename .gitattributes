@@ -23,3 +23,23 @@
 /.scrutinizer.*     export-ignore
 /.editorconfig      export-ignore
 /.coveralls.*       export-ignore
+
+# Define binary file attributes.
+# - Do not treat them as text.
+# - Include binary diff in patches instead of "binary files differ."
+*.pdf binary
+*.mo binary
+*.gif binary
+*.ico binary
+*.jpg binary
+*.png binary
+*.bmp binary
+*.phar binary
+*.zip binary
+*.gz binary
+*.otf binary
+*.eot binary
+*.svg binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
