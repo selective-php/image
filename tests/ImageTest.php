@@ -18,9 +18,6 @@ class ImageTest extends TestCase
      */
     protected function setUp()
     {
-        $this->getTestResultObject()->setTimeoutForSmallTests(600);
-        $this->getTestResultObject()->setTimeoutForMediumTests(600);
-        $this->getTestResultObject()->setTimeoutForLargeTests(600);
     }
 
     /**
