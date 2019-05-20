@@ -33,30 +33,6 @@ class ImageTest extends TestCase
         @unlink(__DIR__ . '/new_example.bmp');
     }
 
-    public function testImageChecksum()
-    {
-        $this->assertSame('cf9bddd5a2621a2c1f825d900e025473c709951d', sha1_file(__DIR__ . '/example.png'));
-        $this->assertSame('e2391b5e454d66829ec28998b745f4ca461e3d87', sha1_file(__DIR__ . '/example.jpg'));
-        $this->assertSame('d8cab6095e8169778fb82ee3df22186f3d4dadf8', sha1_file(__DIR__ . '/example.gif'));
-        $this->assertSame('90d9af8bed6a01008068b2a2ca46ca640fa692a7', sha1_file(__DIR__ . '/example.bmp'));
-    }
-
-    public function testImageCreateFromString()
-    {
-        // Test for PHP 7.1
-        $data = 'iVBORw0KGgoAAAANSUhEUgAAABwAAAASCAMAAAB/2U7WAAAABl'
-            . 'BMVEUAAAD///+l2Z/dAAAASUlEQVR4XqWQUQoAIAxC2/0vXZDr'
-            . 'EX4IJTRkb7lobNUStXsB0jIXIAMSsQnWlsV+wULF4Avk9fLq2r'
-            . '8a5HSE35Q3eO2XP1A1wQkZSgETvDtKdQAAAABJRU5ErkJggg==';
-        $data = base64_decode($data);
-
-        $this->assertIsResource(imagecreatefromstring($data) ?: false);
-        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.png')) ?: false);
-        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.jpg')) ?: false);
-        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.gif')) ?: false);
-        $this->assertIsResource(imagecreatefromstring(file_get_contents(__DIR__ . '/example.bmp')) ?: false);
-    }
-
     /**
      * Test create object.
      *
