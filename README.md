@@ -17,6 +17,7 @@ Image manipulation library.
 
 ## Requirements
 
+* PHP 7.2+
 * The `GD` extension
 
 ## Recommended
