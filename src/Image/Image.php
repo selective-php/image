@@ -48,11 +48,11 @@ class Image
                 break;
             case 'bmp':
 
-                   file_put_contents(
-                        $fileName,
-                        $bit === 16 ? $this->convertImageToBmp16($this->image) : $this->convertImageToBmp24($this->image)
-                    );
-                    break;
+                file_put_contents(
+                    $fileName,
+                    $bit === 16 ? $this->convertImageToBmp16($this->image) : $this->convertImageToBmp24($this->image)
+                );
+                break;
 
             default:
                 throw new InvalidArgumentException(sprintf('Image format not supported: %s', $extension));
@@ -128,6 +128,11 @@ class Image
 
         if (!imageistruecolor($image)) {
             $tmp = imagecreatetruecolor($width, $height);
+
+            if ($tmp === false) {
+                throw new RuntimeException('Image must be a valid image resource');
+            }
+
             imagecopy($tmp, $image, 0, 0, 0, 0, $width, $height);
             imagedestroy($image);
             $image = &$tmp;
@@ -176,6 +181,11 @@ class Image
 
         if (!imageistruecolor($im)) {
             $tmp = imagecreatetruecolor($width, $height);
+
+            if ($tmp === false) {
+                throw new RuntimeException('Image must be a valid image resource');
+            }
+
             imagecopy($tmp, $im, 0, 0, 0, 0, $width, $height);
             imagedestroy($im);
             $im = &$tmp;
@@ -233,11 +243,17 @@ class Image
      *
      * @param string $data String containing the image data
      *
+     * @throws RuntimeException
+     *
      * @return self
      */
     public static function createFromString(string $data): self
     {
         $resource = imagecreatefromstring($data);
+
+        if ($resource === false) {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
 
         $image = new self();
         $image->image = $resource;
@@ -250,11 +266,19 @@ class Image
      *
      * @param string $filename
      *
+     * @throws RuntimeException
+     *
      * @return self
      */
     public static function createFromFile(string $filename): self
     {
-        return static::createFromString(file_get_contents($filename));
+        $content = file_get_contents($filename);
+
+        if ($content === false) {
+            throw new RuntimeException(sprintf('File could not be read: %s', $filename));
+        }
+
+        return static::createFromString($content);
     }
 
     /**
@@ -304,6 +328,10 @@ class Image
         $dstPngH = (int)($srcPngH * $dstPngW / $srcPngW);
 
         $out = imagecreatetruecolor($dstW, $dstH);
+
+        if ($out === false) {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
 
         // 1. layer
         imagecopyresampled($out, $imageBackground, 0, 0, 0, 0, $dstW, $dstH, $srcW, $srcH);
@@ -357,6 +385,10 @@ class Image
                 break;
         }
 
+        if ($image === false || $image === null) {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
+
         $this->validateImageResource($image);
 
         return $image;
@@ -380,7 +412,8 @@ class Image
 
         // load file header
         $file = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
-        if ($file['file_type'] != 19778) {
+
+        if (!$file || $file['file_type'] != 19778) {
             throw new RuntimeException(sprintf('Invalid BMP file type: %s', $fileName));
         }
 
@@ -412,6 +445,11 @@ class Image
         $vide = chr(0);
 
         $res = imagecreatetruecolor($bmp['width'], $bmp['height']);
+
+        if ($res === false) {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
+
         $p = 0;
         $y = $bmp['height'] - 1;
 
@@ -539,6 +577,8 @@ class Image
      * @param int $srcH
      * @param int $quality default = 3 (range 1-?)
      *
+     * @throws RuntimeException
+     *
      * @return bool success
      */
     private function copyImageResampled(&$dstImage, &$srcImage, int $dstX, int $dstY, int $srcX, int $srcY, int $dstW, int $dstH, int $srcW, int $srcH, int $quality = 3): bool
@@ -552,6 +592,11 @@ class Image
 
         if ($quality < 5 && (($dstW * $quality) < $srcW || ($dstH * $quality) < $srcH)) {
             $temp = imagecreatetruecolor($dstH * $quality + 1, $dstH * $quality + 1);
+
+            if ($temp === false) {
+                throw new RuntimeException('Image must be a valid image resource');
+            }
+
             imagecopyresized($temp, $srcImage, 0, 0, $srcX, $srcY, $dstH * $quality + 1, $dstH * $quality + 1, $srcW, $srcH);
             imagecopyresampled($dstImage, $temp, $dstX, $dstY, 0, 0, $dstW, $dstH, $dstW * $quality, $dstH * $quality);
             imagedestroy($temp);
@@ -637,7 +682,16 @@ class Image
         $width = imagesx($image);
         $height = imagesy($image);
         $imgCanvas = imagecreatetruecolor($width, $height);
+
+        if ($imgCanvas === false) {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
+
         $imgBlur = imagecreatetruecolor($width, $height);
+
+        if ($imgBlur === false) {
+            throw new RuntimeException('Image must be a valid image resource');
+        }
 
         // Gaussian blur matrix
         $matrix = [
@@ -697,7 +751,7 @@ class Image
                 $bNew = (abs($bOrig - $bBlur) >= $threshold) ? max(0, min(255, ($amount * ($bOrig - $bBlur)) + $bOrig)) : $bOrig;
 
                 if (($rOrig != $rNew) || ($gOrig != $gNew) || ($bOrig != $bNew)) {
-                    $pixCol = imagecolorallocate($image, $rNew, $gNew, $bNew);
+                    $pixCol = imagecolorallocate($image, (int)$rNew, (int)$gNew, (int)$bNew);
                     imagesetpixel($image, $x, $y, $pixCol);
                 }
             }
@@ -752,7 +806,7 @@ class Image
                     $bNew = 0;
                 }
                 $rgbNew = ($rNew << 16) + ($gNew << 8) + $bNew;
-                imagesetpixel($img, $x, $y, $rgbNew);
+                imagesetpixel($img, $x, $y, (int)$rgbNew);
             }
         }
     }

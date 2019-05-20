@@ -3,6 +3,7 @@
 namespace Selective\Image\Test;
 
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Selective\Image\Image;
 
 /**
@@ -26,10 +27,10 @@ class ImageTest extends TestCase
      */
     protected function tearDown()
     {
-       # @unlink(__DIR__ . '/new_example.png');
-       # @unlink(__DIR__ . '/new_example.jpg');
-       # @unlink(__DIR__ . '/new_example.gif');
-       # @unlink(__DIR__ . '/new_example.bmp');
+        @unlink(__DIR__ . '/new_example.png');
+        @unlink(__DIR__ . '/new_example.jpg');
+        @unlink(__DIR__ . '/new_example.gif');
+        @unlink(__DIR__ . '/new_example.bmp');
     }
 
     /**
@@ -54,7 +55,12 @@ class ImageTest extends TestCase
      */
     public function testCreateFromResource()
     {
-        Image::createFromResource(imagecreate(100, 100));
+        $handle = imagecreate(100, 100);
+        if ($handle === false) {
+            throw new RuntimeException(sprintf('Image could not be read'));
+        }
+        $this->assertIsResource($handle);
+        Image::createFromResource($handle);
 
         $this->assertTrue(true);
     }
@@ -62,7 +68,13 @@ class ImageTest extends TestCase
     public function testCreateFromResourceWithInvalidResource()
     {
         $this->expectException(\RuntimeException::class);
-        Image::createFromResource(fopen('data://text/plain,invalid_img_resource', 'r'));
+
+        $handle = fopen('data://text/plain,invalid_img_resource', 'r');
+        if ($handle === false) {
+            throw new RuntimeException(sprintf('File handle could not be created'));
+        }
+
+        Image::createFromResource($handle);
     }
 
     /**
@@ -103,7 +115,7 @@ class ImageTest extends TestCase
                     $result[] = [
                         __DIR__ . '/example.' . $extension,
                         __DIR__ . '/watermark.' . $extension2,
-                        __DIR__ . '/new_example.' . $extension3,];
+                        __DIR__ . '/new_example.' . $extension3, ];
                 }
             }
         }
@@ -149,7 +161,7 @@ class ImageTest extends TestCase
                 $result[] = [
                     __DIR__ . '/example.' . $extension,
                     __DIR__ . '/watermark.' . $extension,
-                    __DIR__ . '/new_example.' . $extension2,];
+                    __DIR__ . '/new_example.' . $extension2, ];
             }
         }
 
