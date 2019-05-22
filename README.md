@@ -14,15 +14,12 @@ Image manipulation library.
 
 * Converting images to JPEG, GIF, PNG, BMP (16-Bit and 24-Bit)
 * Changing the size and sharpness of images
+* Insert watermark
 
 ## Requirements
 
 * PHP 7.2+
 * The `GD` extension
-
-## Recommended
-
-* The `exif` extension, for better detection of the image format
 
 ## Installation
 
