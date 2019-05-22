@@ -105,6 +105,24 @@ class ImageTest extends TestCase
         return $result;
     }
 
+    /**
+     * @dataProvider saveProvider
+     * @large
+     *
+     * @param string $source
+     * @param string $destination
+     *
+     * @return void
+     */
+    public function testResize(string $source, string $destination)
+    {
+        Image::createFromFile($source)->resize(100, null, false);
+        Image::createFromFile($source)->resize(100, 100, false);
+        Image::createFromFile($source)->resize(100, 100)->save($destination);
+        $this->assertFileExists($destination);
+        Image::createFromFile($destination);
+    }
+
     public function watermarkProvider(): array
     {
         $result = [];
@@ -196,9 +214,4 @@ class ImageTest extends TestCase
         return $result;
     }
 
-    public function testResize()
-    {
-        // todo
-        $this->assertTrue(true);
-    }
 }
