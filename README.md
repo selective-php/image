@@ -6,7 +6,6 @@ Image manipulation library.
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
 [![Build Status](https://travis-ci.org/selective-php/image.svg?branch=master)](https://travis-ci.org/selective-php/image)
 [![Coverage Status](https://scrutinizer-ci.com/g/selective-php/image/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/selective-php/image/code-structure)
-[![Quality Score](https://scrutinizer-ci.com/g/selective-php/image/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/selective-php/image/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/selective/image.svg)](https://packagist.org/packages/selective/image/stats)
 
 
