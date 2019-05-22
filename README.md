@@ -32,25 +32,86 @@ composer require selective/image
 
 ## Usage
 
+### Open an image file
+
 Create the image resource.
 
 ```php
-$image = new \Selective\Image\Image();
+use Selective\Image;
 
-$imageResource = $image->getImage('/path/to/file.jpg');
+$image = Image::createFromFile('example.jpg');
 ```
+
+### Open an image resource
+
+```php
+$resource = imagecreate(100, 100);
+$image = Image::createFromResource($resource);
+```
+
+### Save image in desired format
 
 Encodes the given image resource into given format/quality 
 and save the the new image in filesystem.
 
 ```php
-$image->convertImage($imageResource, '/path/to/new-file.png', 100);
+Image::createFromFile('example.jpg')->save('output.jpg');
 ```
 
-Get the content of the given image resource.
+Convert to JPG with 80% quality 
 
 ```php
-$content = $image->getImageData($imageResource);
+Image::createFromFile('example.jpg')->save('output.jpg', 80);
 ```
 
-If you want more details and examples about the usage, please read the [documentation](docs/README.md).
+Convert to PNG with 100% quality 
+
+```php
+Image::createFromFile('example.jpg')->save('output.png', 100);
+```
+
+Convert to BMP, 24-Bit colors
+
+```php
+Image::createFromFile('example.jpg')->save('output.bmp', 100, 24);
+```
+
+Convert to BMP, 16-Bit colors
+
+```php
+Image::createFromFile('example.jpg')->save('output.bmp', 100, 16);
+```
+
+### Resize image
+
+Resize image to 800x600 pixel
+
+```php
+Image::createFromFile('example.jpg')->resize(800, 600)->save('output.jpg');
+```
+
+Resize image to 1024 pixel and dynamic height
+
+```php
+Image::createFromFile('example.jpg')->resize(1024)->save('output.jpg');
+```
+
+Resize image to 64x64 pixel and sharp the image
+
+```php
+Image::createFromFile('example.jpg')->resize(1024)->save('output.jpg', 64, 64, true);
+```
+
+### Insert watermark
+
+```php
+Image::createFromFile('example.jpg')->insert('watermark.png');
+```
+
+## Similar libraries
+
+* https://github.com/Intervention/image
+
+## License
+
+* MIT

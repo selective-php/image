@@ -134,7 +134,7 @@ class ImageTest extends TestCase
      */
     public function testWatermark(string $source, string $watermark, string $destination)
     {
-        Image::createFromFile($source)->watermark($watermark)->save($destination);
+        Image::createFromFile($source)->insert($watermark)->save($destination);
         $this->assertFileExists($destination);
         Image::createFromFile($destination);
     }
@@ -149,7 +149,7 @@ class ImageTest extends TestCase
      */
     public function testWatermarkWithSharpen(string $source, string $watermark, string $destination)
     {
-        Image::createFromFile($source)->watermark($watermark, ['sharpen' => true])->save($destination);
+        Image::createFromFile($source)->insert($watermark, ['sharpen' => true])->save($destination);
         $this->assertFileExists($destination);
         Image::createFromFile($destination);
     }

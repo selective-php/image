@@ -8,7 +8,7 @@ use RuntimeException;
 /**
  * Image Class.
  */
-class Image
+final class Image
 {
     /**
      * @var resource
@@ -33,7 +33,7 @@ class Image
         }
 
         $this->validateImageResource($this->image);
-        $extension = $this->getImageExtension($fileName);
+        $extension = $this->getFileExtension($fileName);
 
         switch ($extension) {
             case 'jpeg':
@@ -47,13 +47,11 @@ class Image
                 imagepng($this->image, $fileName, $this->getPngCompressionLevel($quality));
                 break;
             case 'bmp':
-
                 file_put_contents(
                     $fileName,
                     $bit === 16 ? $this->convertImageToBmp16($this->image) : $this->convertImageToBmp24($this->image)
                 );
                 break;
-
             default:
                 throw new InvalidArgumentException(sprintf('Image format not supported: %s', $extension));
         }
@@ -62,7 +60,7 @@ class Image
     }
 
     /**
-     * Convert percent to png compresion level from 0 (no compression = 100%) to 9 (max compression = 0%).
+     * Convert percent to png compression level from 0 (no compression = 100%) to 9 (max compression = 0%).
      *
      * @param int $percent percent (higher is better quality)
      *
@@ -79,34 +77,13 @@ class Image
     /**
      * Get image extension.
      *
-     * @param string $fileName
+     * @param string $fileName The filename
      *
-     * @return string The image type
+     * @return string The file extension
      */
-    private function getImageExtension(string $fileName): string
+    private function getFileExtension(string $fileName): string
     {
-        $exifImageLists = [
-            IMAGETYPE_GIF => 'gif',
-            IMAGETYPE_JPEG => 'jpg',
-            IMAGETYPE_BMP => 'bmp',
-            IMAGETYPE_PNG => 'png',
-        ];
-
-        $extension = null;
-
-        if (function_exists('exif_imagetype') && file_exists($fileName)) {
-            $imageType = exif_imagetype($fileName);
-
-            if (isset($exifImageLists[$imageType])) {
-                $extension = $exifImageLists[$imageType];
-            }
-        }
-
-        if ($extension === null) {
-            $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        }
-
-        return $extension;
+        return strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
     }
 
     /**
@@ -299,14 +276,14 @@ class Image
     }
 
     /**
-     * Add watermark to image.
+     * Insert watermark to image.
      *
      * @param string $watermarkFile watermark image filename
      * @param array $params optional parameters
      *
      * @return self
      */
-    public function watermark(string $watermarkFile, array $params = []): self
+    public function insert(string $watermarkFile, array $params = []): self
     {
         $imgToTop = $params['top'] ?? 0;
         $imgToLeft = $params['left'] ?? 0;
@@ -534,7 +511,6 @@ class Image
             $height = (int)($heightOrig * $width / $widthOrig);
         }
 
-        // Resample
         $imageP = imagecreatetruecolor($width, $height);
         $this->copyImageResampled($imageP, $image, 0, 0, 0, 0, $width, $height, $widthOrig, $heightOrig, 3);
 
