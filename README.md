@@ -102,7 +102,7 @@ Image::createFromFile('example.jpg')->resize(1024)->save('output.jpg', 64, 64, t
 ### Insert watermark
 
 ```php
-Image::createFromFile('example.jpg')->insert('watermark.png');
+Image::createFromFile('example.jpg')->insert('watermark.png')->save('output.jpg');
 ```
 
 ## Similar libraries
