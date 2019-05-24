@@ -10,7 +10,7 @@
     "homepage": "https://github.com/selective-php/image",
     "license": "MIT",
     "require": {
-        "php": "^7.1",
+        "php": "^7.2",
         "ext-gd": "*"
     },
     "require-dev": {
