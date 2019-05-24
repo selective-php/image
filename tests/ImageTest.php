@@ -213,5 +213,4 @@ class ImageTest extends TestCase
 
         return $result;
     }
-
 }
