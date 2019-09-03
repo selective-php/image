@@ -11,9 +11,9 @@ Image manipulation library.
 
 ## Features
 
-* Converting images to JPEG, GIF, PNG, BMP (16-Bit and 24-Bit)
-* Changing the size and sharpness of images
-* Insert watermark
+* Convert images to JPEG, GIF, PNG, BMP (16-Bit and 24-Bit)
+* Change the size and sharpness of images
+* Insert watermark image
 
 ## Requirements
 
@@ -30,7 +30,7 @@ composer require selective/image
 
 ### Open image file
 
-Create the image resource.
+Creation of an image instance:
 
 ```php
 use Selective\Image;
@@ -47,32 +47,32 @@ $image = Image::createFromResource($resource);
 
 ### Save image in desired format
 
-Encodes the given image resource into given format/quality 
-and save the the new image in filesystem.
+Encodes the given image instance into a specific format/quality
+and save the new image as a file.
 
 ```php
 Image::createFromFile('example.jpg')->save('output.jpg');
 ```
 
-Convert to JPG with 80% quality 
+Convert to JPG with 80% quality:
 
 ```php
 Image::createFromFile('example.jpg')->save('output.jpg', 80);
 ```
 
-Convert to PNG with 100% quality 
+Convert to PNG with 100% quality:
 
 ```php
 Image::createFromFile('example.jpg')->save('output.png', 100);
 ```
 
-Convert to BMP, 24-Bit colors
+Convert to BMP, 24-Bit colors:
 
 ```php
 Image::createFromFile('example.jpg')->save('output.bmp', 100, 24);
 ```
 
-Convert to BMP, 16-Bit colors
+Convert to BMP, 16-Bit colors:
 
 ```php
 Image::createFromFile('example.jpg')->save('output.bmp', 100, 16);
@@ -80,19 +80,19 @@ Image::createFromFile('example.jpg')->save('output.bmp', 100, 16);
 
 ### Resize image
 
-Resize image to 800x600 pixel
+Resize image to 800x600 pixel:
 
 ```php
 Image::createFromFile('example.jpg')->resize(800, 600)->save('output.jpg');
 ```
 
-Resize image to 1024 pixel and dynamic height
+Resize image to 1024 pixel and dynamic height:
 
 ```php
 Image::createFromFile('example.jpg')->resize(1024)->save('output.jpg');
 ```
 
-Resize image to 64x64 pixel and sharp the image
+Resize image to 64x64 pixel and sharp the image:
 
 ```php
 Image::createFromFile('example.jpg')->resize(1024)->save('output.jpg', 64, 64, true);
