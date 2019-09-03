@@ -28,7 +28,7 @@ composer require selective/image
 
 ## Usage
 
-### Open an image file
+### Open image file
 
 Create the image resource.
 
@@ -38,7 +38,7 @@ use Selective\Image;
 $image = Image::createFromFile('example.jpg');
 ```
 
-### Open an image resource
+### Open image resource
 
 ```php
 $resource = imagecreate(100, 100);
