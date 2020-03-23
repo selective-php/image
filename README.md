@@ -107,6 +107,7 @@ Image::createFromFile('example.jpg')->insert('watermark.png')->save('output.jpg'
 ## Similar libraries
 
 * https://github.com/Intervention/image
+* https://github.com/spatie/image
 
 ## License
 
